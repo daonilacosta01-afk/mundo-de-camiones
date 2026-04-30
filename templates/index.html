@@ -1,0 +1,817 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    body {
+        background: url("https://www.peterbilt.com/static-assets/images/truck/Peterbilt_589_Group2-Exterior.webp") no-repeat center center fixed;
+        background-size: cover;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        position: relative;
+        min-height: 100vh;
+    }
+
+    /* Overlay oscuro animado */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(44, 62, 80, 0.6) 100%);
+        z-index: -1;
+        animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    /* Hero Section mejorado */
+    .hero-container {
+        background: linear-gradient(135deg, rgba(241, 196, 15, 0.15) 0%, rgba(52, 152, 219, 0.15) 100%);
+        backdrop-filter: blur(10px);
+        padding: 50px 30px;
+        border-radius: 20px;
+        color: #fff;
+        max-width: 1000px;
+        margin: 40px auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        animation: slideUp 0.8s ease-out;
+    }
+
+    .hero-container h1 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, #f1c40f, #f39c12, #e67e22);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 2px 2px 20px rgba(241, 196, 15, 0.3);
+        margin-bottom: 20px;
+        animation: slideUp 1s ease-out 0.2s both;
+    }
+
+    .hero-container .lead {
+        font-size: 1.3rem;
+        color: #ecf0f1;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+        line-height: 1.8;
+        animation: slideUp 1s ease-out 0.4s both;
+    }
+
+    /* Estadísticas destacadas */
+    .stats-container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 30px;
+        gap: 20px;
+        flex-wrap: wrap;
+        animation: slideUp 1s ease-out 0.6s both;
+    }
+
+    .stat-box {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        flex: 1;
+        min-width: 150px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .stat-box:hover {
+        background: rgba(241, 196, 15, 0.2);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(241, 196, 15, 0.3);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #f1c40f;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #ecf0f1;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Cards mejoradas con iconos */
+    .cards-section {
+        max-width: 1200px;
+        margin: 60px auto;
+        padding: 0 20px;
+    }
+
+    .section-title {
+        text-align: center;
+        color: #fff;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 50px;
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+        animation: slideUp 1s ease-out 0.8s both;
+    }
+
+    .card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(236, 240, 241, 0.95) 100%);
+        border-radius: 20px;
+        border: none;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        margin-bottom: 30px;
+        position: relative;
+        height: 100%;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, #f1c40f, #e67e22, #3498db);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+
+    .card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(241, 196, 15, 0.4);
+    }
+
+    .card-icon {
+        font-size: 4rem;
+        margin: 30px 0 20px;
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover .card-icon {
+        animation: pulse 0.6s ease-in-out;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+
+    .card-text {
+        color: #555;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        border: none;
+        padding: 12px 35px;
+        font-weight: 600;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.5);
+    }
+
+    /* Animaciones de entrada para las cards */
+    .card {
+        animation: slideUp 0.8s ease-out both;
+    }
+
+    .card:nth-child(1) { animation-delay: 1s; }
+    .card:nth-child(2) { animation-delay: 1.15s; }
+    .card:nth-child(3) { animation-delay: 1.3s; }
+    .card:nth-child(4) { animation-delay: 1.45s; }
+    .card:nth-child(5) { animation-delay: 1.6s; }
+
+    /* CTA Section */
+    .cta-section {
+        background: linear-gradient(135deg, rgba(241, 196, 15, 0.2) 0%, rgba(230, 126, 34, 0.2) 100%);
+        backdrop-filter: blur(10px);
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        max-width: 1000px;
+        margin: 60px auto 40px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: slideUp 1s ease-out 1.75s both;
+    }
+
+    .cta-section h3 {
+        color: #f1c40f;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .cta-section p {
+        color: #ecf0f1;
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+
+    /* ==================== ROBOT DE CONSEJOS ==================== */
+    .tip-robot {
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        z-index: 999;
+        animation: slideInFromLeft 1s ease-out 2s both;
+    }
+
+    @keyframes slideInFromLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .robot-button {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 8px 25px rgba(243, 156, 18, 0.5);
+        transition: all 0.3s ease;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        animation: robotBounce 2s infinite;
+    }
+
+    @keyframes robotBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .robot-button:hover {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 12px 35px rgba(243, 156, 18, 0.7);
+    }
+
+    .robot-icon {
+        font-size: 2.5rem;
+        animation: robotWave 1s ease-in-out infinite;
+    }
+
+    @keyframes robotWave {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-15deg); }
+        75% { transform: rotate(15deg); }
+    }
+
+    .tip-bubble {
+        position: absolute;
+        bottom: 85px;
+        left: 0;
+        width: 350px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(236, 240, 241, 0.98) 100%);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        display: none;
+        border: 2px solid #f39c12;
+        animation: bubbleAppear 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes bubbleAppear {
+        from {
+            opacity: 0;
+            transform: scale(0.8) translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .tip-bubble::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 30px;
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 15px solid #f39c12;
+    }
+
+    .tip-bubble.active {
+        display: block;
+    }
+
+    .tip-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f39c12;
+    }
+
+    .tip-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .tip-emoji {
+        font-size: 1.5rem;
+    }
+
+    .tip-close {
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        color: #95a5a6;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        line-height: 1;
+    }
+
+    .tip-close:hover {
+        color: #e74c3c;
+        transform: rotate(90deg);
+    }
+
+    .tip-content {
+        color: #555;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        text-align: justify;
+    }
+
+    .tip-category {
+        display: inline-block;
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+
+    .tip-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        padding-top: 12px;
+        border-top: 1px solid #ecf0f1;
+    }
+
+    .tip-counter {
+        font-size: 0.8rem;
+        color: #95a5a6;
+        font-weight: 600;
+    }
+
+    .btn-new-tip {
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(46, 204, 113, 0.3);
+    }
+
+    .btn-new-tip:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-container h1 {
+            font-size: 2.5rem;
+        }
+        
+        .hero-container .lead {
+            font-size: 1.1rem;
+        }
+
+        .stat-box {
+            min-width: 120px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .tip-robot {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .robot-button {
+            width: 60px;
+            height: 60px;
+        }
+
+        .robot-icon {
+            font-size: 2rem;
+        }
+
+        .tip-bubble {
+            width: calc(100vw - 40px);
+            left: -10px;
+        }
+    }
+
+    /* Ajuste para 5 tarjetas en desktop */
+    @media (min-width: 992px) {
+        .col-lg-custom {
+            flex: 0 0 auto;
+            width: 20%;
+        }
+    }
+
+    @media (max-width: 991px) and (min-width: 768px) {
+        .col-md-6.col-lg-custom:nth-child(5) {
+            width: 50%;
+            margin: 0 auto;
+        }
+    }
+</style>
+
+<div class="hero-container text-center">
+    <h1>🚛 Mundo de Camiones Pesados</h1>
+    <p class="lead">Descubre la ingeniería detrás de las máquinas más poderosas del transporte. Explora cada componente vital que hace posible mover el mundo.</p>
+    
+    <div class="stats-container">
+        <div class="stat-box">
+            <span class="stat-number">500+</span>
+            <span class="stat-label">HP de Potencia</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">18</span>
+            <span class="stat-label">Velocidades</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">40</span>
+            <span class="stat-label">Toneladas</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">24/7</span>
+            <span class="stat-label">Operación</span>
+        </div>
+    </div>
+</div>
+
+<div class="cards-section">
+    <h2 class="section-title">⚙️ Componentes Principales</h2>
+    
+    <div class="row">
+        <div class="col-md-6 col-lg-custom">
+            <div class="card shadow-lg">
+                <div class="card-body text-center">
+                    <div class="card-icon">🔧</div>
+                    <h5 class="card-title">Motor Diésel</h5>
+                    <p class="card-text">El corazón del camión. Potencia y torque incomparables para largas jornadas de trabajo y cargas extremas.</p>
+                    <a href="/motor" class="btn btn-primary">Explorar Motor</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-custom">
+            <div class="card shadow-lg">
+                <div class="card-body text-center">
+                    <div class="card-icon">⚡</div>
+                    <h5 class="card-title">Transmisión</h5>
+                    <p class="card-text">Sistema inteligente que distribuye la fuerza del motor hacia las ruedas con precisión y eficiencia.</p>
+                    <a href="/transmision" class="btn btn-primary">Ver Transmisión</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-custom">
+            <div class="card shadow-lg">
+                <div class="card-body text-center">
+                    <div class="card-icon">🎯</div>
+                    <h5 class="card-title">Diferencial</h5>
+                    <p class="card-text">Tecnología que mantiene la tracción óptima incluso en los terrenos más complicados y exigentes.</p>
+                    <a href="/diferencial" class="btn btn-primary">Conocer Más</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-custom">
+            <div class="card shadow-lg">
+                <div class="card-body text-center">
+                    <div class="card-icon">🛡️</div>
+                    <h5 class="card-title">Carrocería</h5>
+                    <p class="card-text">Estructura robusta diseñada para soportar grandes cargas y proteger al conductor en cualquier situación.</p>
+                    <a href="/carroceria" class="btn btn-primary">Ver Detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-custom">
+            <div class="card shadow-lg">
+                <div class="card-body text-center">
+                    <div class="card-icon">🛞</div>
+                    <h5 class="card-title">Gomas</h5>
+                    <p class="card-text">Neumáticos de alto rendimiento que proporcionan tracción, estabilidad y seguridad en cualquier terreno.</p>
+                    <a href="/gomas" class="btn btn-primary">Ver Gomas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <h3>💡 ¿Listo para Aprender Más?</h3>
+    <p>Cada componente cuenta una historia de innovación y potencia. Selecciona cualquier sección para profundizar en la mecánica que impulsa el transporte mundial.</p>
+</div>
+
+<!-- ==================== ROBOT DE CONSEJOS ==================== -->
+<div class="tip-robot">
+    <div class="tip-bubble" id="tipBubble">
+        <div class="tip-header">
+            <div class="tip-title">
+                <span class="tip-emoji" id="tipEmoji">💡</span>
+                <span>Consejo del Experto</span>
+            </div>
+            <button class="tip-close" id="tipClose">×</button>
+        </div>
+        <div class="tip-category" id="tipCategory">Cargando...</div>
+        <div class="tip-content" id="tipContent">
+            Haz clic en el robot para obtener un consejo profesional sobre el cuidado y mantenimiento de tu camión.
+        </div>
+        <div class="tip-footer">
+            <span class="tip-counter" id="tipCounter">Consejo #0</span>
+            <button class="btn-new-tip" id="newTipBtn">Nuevo Consejo ✨</button>
+        </div>
+    </div>
+    <div class="robot-button" id="robotButton">
+        <span class="robot-icon">🤖</span>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const robotButton = document.getElementById('robotButton');
+    const tipBubble = document.getElementById('tipBubble');
+    const tipClose = document.getElementById('tipClose');
+    const newTipBtn = document.getElementById('newTipBtn');
+    const tipContent = document.getElementById('tipContent');
+    const tipCategory = document.getElementById('tipCategory');
+    const tipEmoji = document.getElementById('tipEmoji');
+    const tipCounter = document.getElementById('tipCounter');
+    
+    let tipCount = 0;
+    
+    // Base de datos masiva de consejos
+    const tips = [
+        // MANTENIMIENTO GENERAL
+        {category: "Mantenimiento", emoji: "🔧", tip: "Revisa el nivel de aceite del motor cada mañana antes de arrancar. Un motor bien lubricado puede durar más de 1 millón de kilómetros."},
+        {category: "Mantenimiento", emoji: "🛢️", tip: "Cambia el aceite del motor cada 15,000-25,000 km según el fabricante. Usar aceite sintético puede extender estos intervalos hasta 40,000 km."},
+        {category: "Mantenimiento", emoji: "🔍", tip: "Inspecciona las mangueras y correas cada semana. Una correa rota en carretera puede costarte horas de tiempo y cientos de dólares."},
+        {category: "Mantenimiento", emoji: "⚙️", tip: "Lubrica todos los puntos de engrase cada 5,000 km. Un camión típico tiene entre 30-50 puntos que requieren lubricación regular."},
+        {category: "Mantenimiento", emoji: "🔩", tip: "Revisa el torque de las tuercas de las ruedas después de los primeros 80-160 km de instalar neumáticos nuevos."},
+        
+        // TERRENOS DIFÍCILES
+        {category: "Terreno Difícil", emoji: "🏔️", tip: "En terrenos montañosos, usa marchas bajas para mantener el control. Nunca confíes solo en los frenos en bajadas prolongadas."},
+        {category: "Terreno Difícil", emoji: "🌧️", tip: "En caminos mojados, reduce la velocidad un 30% y aumenta la distancia de frenado al doble de lo normal."},
+        {category: "Terreno Difícil", emoji: "❄️", tip: "En nieve o hielo, arranca en segunda marcha para reducir el deslizamiento de las ruedas y mantén movimientos suaves."},
+        {category: "Terreno Difícil", emoji: "🏜️", tip: "En arena o barro, reduce la presión de los neumáticos un 20-30% para aumentar la superficie de contacto y mejorar la tracción."},
+        {category: "Terreno Difícil", emoji: "🌊", tip: "Al cruzar agua, avanza lentamente y de forma constante. Nunca te detengas en medio del agua profunda."},
+        
+        // SUBIDAS
+        {category: "Subidas", emoji: "⛰️", tip: "En subidas pronunciadas, mantén una marcha constante. Cambiar de marcha a mitad de subida puede hacerte perder impulso crítico."},
+        {category: "Subidas", emoji: "📈", tip: "Antes de una subida larga, reduce una o dos marchas para mantener las RPM en el rango óptimo de torque (1400-1600 RPM)."},
+        {category: "Subidas", emoji: "🚀", tip: "Toma impulso antes de iniciar una subida pronunciada, pero sin exceder los límites de velocidad."},
+        {category: "Subidas", emoji: "⚡", tip: "Monitorea la temperatura del motor en subidas largas. Si sube mucho, detente de forma segura y deja enfriar."},
+        {category: "Subidas", emoji: "💪", tip: "En subidas muy pronunciadas con carga pesada, es mejor subir lento y seguro que forzar el motor."},
+        
+        // BAJADAS
+        {category: "Bajadas", emoji: "🏔️", tip: "Usa el freno motor (Jacob Brake/Engine Brake) en bajadas largas para evitar sobrecalentamiento de los frenos."},
+        {category: "Bajadas", emoji: "⬇️", tip: "Selecciona una marcha baja ANTES de iniciar el descenso. La misma marcha que usarías para subir esa pendiente."},
+        {category: "Bajadas", emoji: "🛑", tip: "En bajadas prolongadas, aplica los frenos de servicio en intervalos cortos (técnica de frenado intermitente)."},
+        {category: "Bajadas", emoji: "🌡️", tip: "Detente cada 15-20 minutos en bajadas muy largas para verificar la temperatura de los frenos y tambores."},
+        {category: "Bajadas", emoji: "⚠️", tip: "Nunca pongas el cambio en neutral en una bajada. Siempre mantén una marcha engranada para control total."},
+        
+        // CONDUCCIÓN EN CARRETERA
+        {category: "Carretera", emoji: "🛣️", tip: "Mantén una distancia de seguimiento de al menos 6 segundos con el vehículo de adelante (más con carga o mal clima)."},
+        {category: "Carretera", emoji: "⏱️", tip: "Usa el control crucero en carreteras planas para ahorrar hasta un 10% de combustible y reducir la fatiga."},
+        {category: "Carretera", emoji: "👀", tip: "Revisa todos los espejos cada 5-8 segundos. La conciencia situacional previene el 70% de los accidentes."},
+        {category: "Carretera", emoji: "💨", tip: "Evita aceleraciones y frenados bruscos. Una conducción suave puede ahorrar hasta 15% de combustible."},
+        {category: "Carretera", emoji: "🌙", tip: "En viajes nocturnos, reduce la velocidad un 10-15%. La visibilidad reducida aumenta significativamente los riesgos."},
+        
+        // NEUMÁTICOS
+        {category: "Neumáticos", emoji: "🛞", tip: "Revisa la presión de los neumáticos cada mañana en frío. Una presión incorrecta reduce la vida útil hasta un 25%."},
+        {category: "Neumáticos", emoji: "📏", tip: "La profundidad mínima legal del dibujo es 1.6mm, pero reemplaza los neumáticos cuando lleguen a 3mm para máxima seguridad."},
+        {category: "Neumáticos", emoji: "🔄", tip: "Rota los neumáticos cada 40,000-50,000 km para asegurar desgaste uniforme y maximizar su vida útil."},
+        {category: "Neumáticos", emoji: "⚖️", tip: "Balancea y alinea los neumáticos cada vez que notes vibración o cada 80,000 km para evitar desgaste irregular."},
+        {category: "Neumáticos", emoji: "🌡️", tip: "La presión aumenta con la temperatura. Por cada 5°C de aumento, la presión sube aproximadamente 1 PSI."},
+        
+        // FRENOS
+        {category: "Frenos", emoji: "🛑", tip: "Revisa el grosor de las balatas cada 20,000 km. Reemplázalas cuando tengan menos de 6mm de material."},
+        {category: "Frenos", emoji: "💧", tip: "Drena los tanques de aire cada día. La humedad acumulada puede congelar las líneasen clima frío."},
+{category: "Frenos", emoji: "🔊", tip: "Si escuchas chirridos al frenar, inspecciona inmediatamente. Puede ser señal de balatas gastadas o tambores dañados."},
+{category: "Frenos", emoji: "⚡", tip: "Realiza una prueba de frenos antes de cada viaje: verifica la caída de presión del sistema (no más de 3 PSI en 1 minuto)."},
+{category: "Frenos", emoji: "🔧", tip: "Ajusta los frenos automáticos cada 40,000 km o cuando notes mayor recorrido del pedal."},
+    // MOTOR
+    {category: "Motor", emoji: "🔥", tip: "Deja calentar el motor 3-5 minutos antes de conducir, especialmente en clima frío. Esto prolonga la vida del motor."},
+    {category: "Motor", emoji: "🌡️", tip: "La temperatura normal de operación del motor es 85-95°C. Si supera 100°C, detente y deja enfriar."},
+    {category: "Motor", emoji: "💨", tip: "Cambia el filtro de aire cada 40,000-60,000 km. Un filtro sucio reduce la potencia hasta un 10%."},
+    {category: "Motor", emoji: "🔍", tip: "Revisa si hay fugas de aceite después de cada parada larga. Una fuga pequeña puede convertirse en un problema mayor."},
+    {category: "Motor", emoji: "⚙️", tip: "Escucha ruidos anormales del motor. Un golpeteo puede indicar problemas en válvulas, inyectores o rodamientos."},
+    
+    // TRANSMISIÓN
+    {category: "Transmisión", emoji: "⚙️", tip: "Cambia el aceite de la transmisión cada 80,000-160,000 km según el fabricante y tipo de servicio."},
+    {category: "Transmisión", emoji: "🔄", tip: "Nunca fuerces los cambios. Si una marcha no entra suavemente, usa el doble embrague."},
+    {category: "Transmisión", emoji: "🎯", tip: "Mantén las RPM entre 1200-1600 al cambiar para cambios suaves y menor desgaste."},
+    {category: "Transmisión", emoji: "❄️", tip: "En clima frío, la transmisión manual puede ser más difícil de cambiar hasta que se caliente."},
+    {category: "Transmisión", emoji: "⚠️", tip: "Si notas dificultad para engranar, revisa el nivel de aceite de la transmisión inmediatamente."},
+    
+    // COMBUSTIBLE
+    {category: "Combustible", emoji: "⛽", tip: "Llena el tanque al final del día para minimizar condensación de agua durante la noche."},
+    {category: "Combustible", emoji: "💧", tip: "Drena el separador de agua del filtro de combustible semanalmente para prevenir daños en los inyectores."},
+    {category: "Combustible", emoji: "🌡️", tip: "En invierno, usa aditivos anti-gel para diésel cuando la temperatura baje de 0°C."},
+    {category: "Combustible", emoji: "📊", tip: "Monitorea el consumo de combustible. Un aumento del 10% puede indicar problemas mecánicos."},
+    {category: "Combustible", emoji: "🔧", tip: "Cambia los filtros de combustible cada 40,000 km o según lo recomiende el fabricante."},
+    
+    // SISTEMA ELÉCTRICO
+    {category: "Eléctrico", emoji: "🔋", tip: "Limpia los terminales de la batería cada 3 meses para prevenir corrosión y mala conexión."},
+    {category: "Eléctrico", emoji: "⚡", tip: "Revisa la tensión del alternador (13.5-14.5V con motor encendido). Fuera de este rango, repáralo de inmediato."},
+    {category: "Eléctrico", emoji: "💡", tip: "Prueba todas las luces semanalmente. Las luces defectuosas son una de las principales causas de inspecciones fallidas."},
+    {category: "Eléctrico", emoji: "🔌", tip: "Desconecta las baterías si el camión estará inactivo más de 2 semanas para evitar descarga."},
+    {category: "Eléctrico", emoji: "🛠️", tip: "Lleva cables pasa-corriente de servicio pesado. Los de auto común no son suficientes para un camión."},
+    
+    // SEGURIDAD
+    {category: "Seguridad", emoji: "🦺", tip: "Usa siempre el cinturón de seguridad. En un accidente a 80 km/h, el impacto equivale a caer desde un edificio de 4 pisos."},
+    {category: "Seguridad", emoji: "📱", tip: "Nunca uses el celular mientras conduces. Una distracción de 5 segundos a 90 km/h recorres 125 metros a ciegas."},
+    {category: "Seguridad", emoji: "😴", tip: "Detente cada 2 horas o 200 km. La fatiga del conductor es responsable del 30% de accidentes fatales."},
+    {category: "Seguridad", emoji: "🚨", tip: "Lleva un kit de emergencia: triángulos, extintor, botiquín, linterna, herramientas básicas y agua."},
+    {category: "Seguridad", emoji: "🔦", tip: "Revisa el extintor mensualmente. Debe estar cargado, sin corrosión y fácilmente accesible."},
+    
+    // CARGA
+    {category: "Carga", emoji: "📦", tip: "Distribuye la carga uniformemente. El 60% del peso debe estar sobre el eje de tracción."},
+    {category: "Carga", emoji: "🔗", tip: "Revisa las amarras cada 80 km en los primeros 240 km, luego cada parada. Las cargas se asientan y aflojan."},
+    {category: "Carga", emoji: "⚖️", tip: "Nunca excedas el peso máximo por eje. Las multas son costosas y el daño al camión es mayor."},
+    {category: "Carga", emoji: "📏", tip: "Verifica la altura total del camión cargado. Muchos puentes tienen restricciones de altura."},
+    {category: "Carga", emoji: "🎯", tip: "El centro de gravedad debe estar lo más bajo posible. Coloca los items pesados abajo."},
+    
+    // ECONOMÍA DE COMBUSTIBLE
+    {category: "Economía", emoji: "💰", tip: "Conducir a 90 km/h en vez de 110 km/h puede ahorrar hasta 25% de combustible en viajes largos."},
+    {category: "Economía", emoji: "🌬️", tip: "Reduce la resistencia al aire: mantén ventanas cerradas y usa deflectores de aire correctamente ajustados."},
+    {category: "Economía", emoji: "⏱️", tip: "Planifica tu ruta para evitar tráfico pesado y semáforos. Las paradas frecuentes consumen 40% más combustible."},
+    {category: "Economía", emoji: "❄️", tip: "No dejes el motor en ralentí más de 5 minutos. Apágalo si la espera será prolongada."},
+    {category: "Economía", emoji: "📊", tip: "Mantén el motor entre 1200-1600 RPM. Operar fuera de este rango aumenta el consumo significativamente."},
+    
+    // CLIMA FRÍO
+    {category: "Clima Frío", emoji: "❄️", tip: "Usa calentador de bloque cuando la temperatura baje de -10°C. Facilita el arranque y reduce el desgaste."},
+    {category: "Clima Frío", emoji: "🧊", tip: "Verifica el anticongelante antes del invierno. Debe proteger hasta -35°C como mínimo."},
+    {category: "Clima Frío", emoji: "🌬️", tip: "Lleva cadenas para nieve y practica instalarlas antes de necesitarlas en emergencia."},
+    {category: "Clima Frío", emoji: "🔋", tip: "Las baterías pierden 35% de potencia a 0°C y 60% a -18°C. Considera baterías de mayor amperaje para invierno."},
+    {category: "Clima Frío", emoji: "💨", tip: "Usa diésel de invierno (winter blend) cuando la temperatura baje de 0°C para evitar gelificación."},
+    
+    // CLIMA CÁLIDO
+    {category: "Clima Cálido", emoji: "☀️", tip: "Revisa el sistema de enfriamiento antes del verano. Llena con refrigerante de calidad 50/50 con agua destilada."},
+    {category: "Clima Cálido", emoji: "🌡️", tip: "Los neumáticos se calientan en verano. Revisa la presión cuando estén fríos y ajusta según carga."},
+    {category: "Clima Cálido", emoji: "💦", tip: "Lleva agua extra en clima cálido, tanto para ti como para el sistema de enfriamiento del camión."},
+    {category: "Clima Cálido", emoji: "🔥", tip: "El asfalto caliente aumenta la resistencia al rodaje. Aumenta el consumo de combustible un 3-5%."},
+    {category: "Clima Cálido", emoji: "🌞", tip: "Estaciona a la sombra cuando sea posible. El interior del camión puede alcanzar 70°C dañando plásticos y electrónica."},
+    
+    // DIFERENCIAL
+    {category: "Diferencial", emoji: "🎯", tip: "Cambia el aceite del diferencial cada 60,000-100,000 km. Usa el grado correcto según el fabricante."},
+    {category: "Diferencial", emoji: "🔊", tip: "Un zumbido que cambia con la velocidad indica desgaste en el diferencial. Inspecciona inmediatamente."},
+    {category: "Diferencial", emoji: "💧", tip: "Revisa fugas de aceite en el diferencial mensualmente. Las fugas pequeñas se vuelven grandes rápidamente."},
+    {category: "Diferencial", emoji: "⚙️", tip: "El diferencial bloqueado solo debe usarse en terreno difícil. Úsalo en pavimento daña los componentes."},
+    {category: "Diferencial", emoji: "🔧", tip: "Verifica el juego (backlash) del diferencial cada 100,000 km. El juego excesivo causa daños costosos."},
+    
+    // SUSPENSIÓN
+    {category: "Suspensión", emoji: "🛞", tip: "Inspecciona los resortes y amortiguadores cada 40,000 km. Componentes gastados aumentan el desgaste de neumáticos."},
+    {category: "Suspensión", emoji: "🔩", tip: "Aprieta los U-bolts de los resortes después de instalar resortes nuevos o cada 80,000 km."},
+    {category: "Suspensión", emoji: "⚠️", tip: "Un camión que rebota excesivamente tiene amortiguadores gastados. Reemplázalos para mejor control y seguridad."},
+    {category: "Suspensión", emoji: "🔍", tip: "Busca grietas en los resortes durante inspecciones. Un resorte roto puede causar accidentes graves."},
+    {category: "Suspensión", emoji: "🎯", tip: "La suspensión neumática requiere mantenimiento de las bolsas de aire. Revisa por fugas y grietas regularmente."},
+    
+    // DIRECCIÓN
+    {category: "Dirección", emoji: "🎯", tip: "El juego en el volante no debe exceder 5 cm (2 pulgadas). Más que eso requiere inspección inmediata."},
+    {category: "Dirección", emoji: "💧", tip: "Revisa el nivel de fluido de dirección hidráulica semanalmente. Nivel bajo indica fugas en el sistema."},
+    {category: "Dirección", emoji: "🔊", tip: "Ruidos al girar pueden indicar articulaciones desgastadas o falta de lubricación en componentes de dirección."},
+    {category: "Dirección", emoji: "⚖️", tip: "Alinea la dirección cada 80,000 km o cuando notes desgaste irregular de neumáticos."},
+    {category: "Dirección", emoji: "🛠️", tip: "Revisa las terminales de dirección y rótulas cada 40,000 km. Son componentes críticos de seguridad."},
+    
+    // ESCAPE Y EMISIONES
+    {category: "Emisiones", emoji: "💨", tip: "Revisa el sistema SCR (reducción catalítica selectiva) si tu camión lo tiene. Mantén el DEF (urea) siempre lleno."},
+    {category: "Emisiones", emoji: "🔧", tip: "Limpia el filtro DPF (filtro de partículas diésel) según indicador. La regeneración forzada requiere conducción en carretera."},
+    {category: "Emisiones", emoji: "⚠️", tip: "Nunca ignores las luces de advertencia de emisiones. Pueden poner el motor en modo limitado (limp mode)."},
+    {category: "Emisiones", emoji: "🌡️", tip: "El sistema de emisiones funciona mejor cuando el motor alcanza temperatura normal de operación rápidamente."},
+    {category: "Emisiones", emoji: "🔍", tip: "Inspecciona el tubo de escape por agujeros o fugas. Las fugas antes del turbo reducen potencia y eficiencia."},
+    
+    // PRE-VIAJE
+    {category: "Pre-viaje", emoji: "✅", tip: "Realiza una inspección pre-viaje completa CADA día. Toma 15-20 minutos y puede prevenir averías costosas."},
+    {category: "Pre-viaje", emoji: "📋", tip: "Lleva un checklist de inspección. Revisar los mismos puntos garantiza que no olvides nada importante."},
+    {category: "Pre-viaje", emoji: "🔦", tip: "Lleva una linterna potente para inspecciones pre-viaje. Muchos problemas solo se ven con buena iluminación."},
+    {category: "Pre-viaje", emoji: "📝", tip: "Documenta cualquier defecto encontrado en la inspección pre-viaje. Es importante para mantenimiento y registros."},
+    {category: "Pre-viaje", emoji: "⏰", tip: "Haz la inspección pre-viaje con tiempo suficiente para reparar problemas menores antes de salir."}
+];
+
+function getRandomTip() {
+    return tips[Math.floor(Math.random() * tips.length)];
+}
+
+function showNewTip() {
+    const tip = getRandomTip();
+    tipContent.textContent = tip.tip;
+    tipCategory.textContent = tip.category;
+    tipEmoji.textContent = tip.emoji;
+    tipCount++;
+    tipCounter.textContent = `Consejo #${tipCount}`;
+    
+    // Animación de entrada
+    tipBubble.style.animation = 'none';
+    setTimeout(() => {
+        tipBubble.style.animation = 'bubbleAppear 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    }, 10);
+}
+
+robotButton.addEventListener('click', () => {
+    tipBubble.classList.toggle('active');
+    if (tipBubble.classList.contains('active') && tipCount === 0) {
+        showNewTip();
+    }
+});
+
+tipClose.addEventListener('click', () => {
+    tipBubble.classList.remove('active');
+});
+
+newTipBtn.addEventListener('click', showNewTip);
+
+// Cerrar al hacer clic fuera
+document.addEventListener('click', (e) => {
+    if (!tipBubble.contains(e.target) && !robotButton.contains(e.target)) {
+        tipBubble.classList.remove('active');
+    }
+});
+});
+</script>
+{% endblock %}

@@ -1,0 +1,1213 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --steel: #8ba0b4;
+  --dark-base: #0a0c10;
+  --dark-surface: #111520;
+  --dark-card: #161b26;
+  --dark-card-hover: #1d2535;
+  --border-dim: rgba(255,255,255,0.07);
+  --border-glow: rgba(201,168,76,0.35);
+  --text-primary: #f0f4f8;
+  --text-secondary: #8ba0b4;
+  --text-muted: #4a5568;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --transition: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--dark-base);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ── BACKGROUND GRID ── */
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* ── BACKGROUND ORBS ── */
+.bg-orb {
+  position: fixed; border-radius: 50%; filter: blur(120px);
+  pointer-events: none; z-index: 0;
+}
+.bg-orb-1 { width: 600px; height: 600px; top: -200px; right: -200px; background: rgba(201,168,76,0.06); }
+.bg-orb-2 { width: 500px; height: 500px; bottom: -150px; left: -150px; background: rgba(52,100,180,0.07); }
+
+/* ── GEAR ANIMATIONS ── */
+@keyframes gearCW   { from { transform: rotate(0deg);    } to { transform: rotate(360deg);   } }
+@keyframes gearCCW  { from { transform: rotate(0deg);    } to { transform: rotate(-360deg);  } }
+
+.gear-cw-fast  { animation: gearCW  16s linear infinite; transform-origin: 50% 50%; }
+.gear-ccw-med  { animation: gearCCW 22s linear infinite; transform-origin: 50% 50%; }
+.gear-cw-slow  { animation: gearCW  30s linear infinite; transform-origin: 50% 50%; }
+.gear-ccw-slow { animation: gearCCW 38s linear infinite; transform-origin: 50% 50%; }
+.gear-cw-xslow { animation: gearCW  52s linear infinite; transform-origin: 50% 50%; }
+
+/* ── GEAR BACKGROUND CONTAINER ── */
+.bg-gears {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; overflow: hidden;
+}
+.bg-shafts {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; overflow: hidden;
+}
+
+/* ── WRAPPER ── */
+.page-wrap { position: relative; z-index: 1; }
+
+/* ── BACK BUTTON ── */
+.btn-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border-radius: 50px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-dim);
+  color: var(--text-secondary);
+  font-size: 14px; font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s var(--transition);
+  backdrop-filter: blur(12px);
+}
+.btn-back:hover { background: rgba(201,168,76,0.12); border-color: var(--border-glow); color: var(--gold-light); transform: translateX(-4px); }
+.btn-back svg { width: 16px; height: 16px; transition: transform 0.3s var(--transition); }
+.btn-back:hover svg { transform: translateX(-3px); }
+
+/* ── HERO HEADER ── */
+.hero-header {
+  text-align: center;
+  padding: 60px 20px 50px;
+  opacity: 0;
+  animation: fadeUp 0.9s var(--transition) 0.1s forwards;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 20px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; display: block; width: 30px; height: 1px; background: var(--gold); opacity: 0.5;
+}
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 8vw, 96px);
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  background: linear-gradient(135deg, #fff 0%, var(--gold-light) 50%, var(--steel) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 20px;
+}
+.hero-sub {
+  font-size: 16px; color: var(--text-secondary);
+  max-width: 540px; margin: 0 auto 40px;
+  line-height: 1.7;
+}
+
+/* ── SEARCH & FILTERS ── */
+.controls-bar {
+  max-width: 760px; margin: 0 auto 50px;
+  opacity: 0; animation: fadeUp 0.9s var(--transition) 0.3s forwards;
+}
+.search-wrap {
+  position: relative; margin-bottom: 16px;
+}
+.search-icon {
+  position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; color: var(--text-muted); pointer-events: none;
+}
+#searchInput {
+  width: 100%; padding: 16px 20px 16px 50px;
+  background: var(--dark-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 50px; color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif; font-size: 15px;
+  outline: none; transition: all 0.3s var(--transition);
+}
+#searchInput::placeholder { color: var(--text-muted); }
+#searchInput:focus { border-color: var(--border-glow); background: var(--dark-card-hover); box-shadow: 0 0 0 4px rgba(201,168,76,0.08); }
+
+.filter-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.filter-chip {
+  padding: 7px 18px; border-radius: 50px;
+  background: var(--dark-card);
+  border: 1px solid var(--border-dim);
+  color: var(--text-secondary); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.25s var(--transition); user-select: none;
+}
+.filter-chip:hover { border-color: rgba(255,255,255,0.2); color: var(--text-primary); }
+.filter-chip.active { background: rgba(201,168,76,0.15); border-color: var(--border-glow); color: var(--gold-light); }
+
+/* ── BRAND CARDS GRID ── */
+#brandsRow { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+
+.brand-card {
+  background: var(--dark-card);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  cursor: pointer;
+  transition: border-color 0.3s var(--transition), background 0.3s var(--transition);
+  position: relative; overflow: hidden;
+  transform-style: preserve-3d;
+  opacity: 0; transform: translateY(30px);
+  will-change: transform;
+}
+.brand-card.revealed { opacity: 1; transform: translateY(0); transition: opacity 0.6s var(--transition), transform 0.6s var(--transition), border-color 0.3s, background 0.3s; }
+.brand-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), rgba(201,168,76,0.06), transparent 40%);
+  opacity: 0; transition: opacity 0.4s; pointer-events: none;
+}
+.brand-card:hover::after { opacity: 1; }
+.brand-card:hover { border-color: var(--border-glow); background: var(--dark-card-hover); }
+
+.card-icon {
+  width: 44px; height: 44px;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+  transition: all 0.3s var(--transition);
+}
+.brand-card:hover .card-icon { background: rgba(201,168,76,0.18); transform: scale(1.08) rotate(-3deg); }
+.card-icon svg { width: 22px; height: 22px; color: var(--gold); }
+
+.card-title { font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.card-count { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+.card-arrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 500; color: var(--gold);
+  transition: gap 0.3s var(--transition);
+}
+.brand-card:hover .card-arrow { gap: 10px; }
+.card-arrow svg { width: 14px; height: 14px; }
+
+.brand-card.hidden { display: none; }
+
+/* ── COMPARE BAR ── */
+#compareBar {
+  position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
+  background: var(--dark-surface);
+  border: 1px solid var(--border-glow);
+  border-radius: 50px;
+  padding: 14px 24px;
+  display: flex; align-items: center; gap: 16px;
+  z-index: 1000;
+  backdrop-filter: blur(20px);
+  transition: bottom 0.5s var(--transition);
+  white-space: nowrap;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+#compareBar.visible { bottom: 28px; }
+#compareBar .compare-label { font-size: 13px; color: var(--text-secondary); }
+#compareBar .compare-count { font-size: 15px; font-weight: 600; color: var(--gold); }
+.btn-compare-now {
+  padding: 9px 22px; border-radius: 50px;
+  background: var(--gold); color: #0a0c10;
+  font-size: 13px; font-weight: 600; border: none;
+  cursor: pointer; transition: all 0.25s var(--transition);
+}
+.btn-compare-now:hover { background: var(--gold-light); transform: scale(1.04); }
+.btn-compare-clear {
+  padding: 9px 18px; border-radius: 50px;
+  background: transparent; color: var(--text-secondary);
+  font-size: 13px; border: 1px solid var(--border-dim);
+  cursor: pointer; transition: all 0.25s var(--transition);
+}
+.btn-compare-clear:hover { border-color: rgba(255,255,255,0.2); color: var(--text-primary); }
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(5,7,12,0.88); backdrop-filter: blur(16px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.35s var(--transition);
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+/* ── BRAND MODAL ── */
+.brand-modal-box {
+  background: var(--dark-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  width: 100%; max-width: 900px; max-height: 88vh;
+  overflow-y: auto;
+  transform: translateY(30px) scale(0.97);
+  transition: transform 0.45s var(--transition);
+}
+.modal-overlay.open .brand-modal-box { transform: translateY(0) scale(1); }
+
+.modal-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24px 28px; border-bottom: 1px solid var(--border-dim);
+  position: sticky; top: 0; z-index: 1;
+  background: var(--dark-surface);
+}
+.modal-hdr-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.05em; color: var(--text-primary); }
+.modal-hdr-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.btn-close-modal {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border-dim);
+  color: var(--text-secondary); font-size: 20px; line-height: 1;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+}
+.btn-close-modal:hover { background: rgba(255,255,255,0.12); color: var(--text-primary); transform: rotate(90deg); }
+
+.models-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px; padding: 24px 28px;
+}
+
+/* ── MODEL THUMBNAIL ── */
+.model-thumb {
+  background: var(--dark-card);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md); overflow: hidden;
+  cursor: pointer; transition: all 0.35s var(--transition);
+  position: relative;
+}
+.model-thumb:hover { border-color: var(--border-glow); transform: translateY(-6px); }
+.model-thumb-img-wrap { position: relative; overflow: hidden; height: 140px; }
+.model-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--transition); }
+.model-thumb:hover img { transform: scale(1.1); }
+
+.model-preview {
+  position: absolute; inset: 0;
+  background: rgba(5,7,12,0.88);
+  padding: 14px; display: flex; flex-direction: column; justify-content: flex-end;
+  opacity: 0; transition: opacity 0.3s var(--transition);
+  backdrop-filter: blur(4px);
+}
+.model-thumb:hover .model-preview { opacity: 1; }
+.preview-tag {
+  display: inline-block; padding: 3px 8px; border-radius: 4px;
+  background: rgba(201,168,76,0.2); border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold-light); font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;
+  width: fit-content;
+}
+.preview-spec { font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+.preview-spec strong { color: var(--text-primary); }
+
+.model-thumb-body { padding: 12px 14px; }
+.model-thumb-name { font-size: 13px; font-weight: 500; color: var(--text-primary); line-height: 1.4; }
+
+.compare-check-wrap {
+  position: absolute; top: 8px; right: 8px;
+  width: 26px; height: 26px; z-index: 10;
+}
+.compare-check {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: rgba(10,12,16,0.85);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.compare-check.checked { background: var(--gold); border-color: var(--gold); }
+.compare-check svg { width: 14px; height: 14px; color: #0a0c10; opacity: 0; transition: opacity 0.2s; }
+.compare-check.checked svg { opacity: 1; }
+
+/* ── DETAIL MODAL ── */
+.detail-modal-box {
+  background: var(--dark-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  width: 100%; max-width: 820px; max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(30px) scale(0.97);
+  transition: transform 0.45s var(--transition);
+}
+.modal-overlay.open .detail-modal-box { transform: translateY(0) scale(1); }
+
+.detail-inner { display: grid; grid-template-columns: 1fr 1fr; }
+@media (max-width: 640px) { .detail-inner { grid-template-columns: 1fr; } }
+
+.detail-img-col { position: relative; min-height: 300px; overflow: hidden; border-radius: var(--radius-lg) 0 0 var(--radius-lg); }
+@media (max-width: 640px) { .detail-img-col { border-radius: var(--radius-lg) var(--radius-lg) 0 0; min-height: 240px; } }
+#detailImage {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 0.1s linear;
+  transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
+}
+.img-zoom-hint {
+  position: absolute; bottom: 12px; left: 12px;
+  font-size: 10px; color: rgba(255,255,255,0.4);
+  background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 20px;
+  pointer-events: none; letter-spacing: 0.05em;
+}
+
+.nav-arrows {
+  position: absolute; bottom: 12px; right: 12px; display: flex; gap: 6px;
+}
+.nav-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(10,12,16,0.85); border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-primary); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s; font-size: 14px;
+}
+.nav-btn:hover { background: rgba(201,168,76,0.2); border-color: var(--border-glow); }
+
+.detail-info-col { padding: 32px 28px; display: flex; flex-direction: column; }
+.detail-brand-badge {
+  display: inline-block; padding: 4px 12px; border-radius: 4px;
+  background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25);
+  color: var(--gold); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 12px; width: fit-content;
+}
+#detailName { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 0.04em; line-height: 1; margin-bottom: 16px; }
+#detailDesc { font-size: 14px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 24px; flex: 1; }
+
+.specs-table { width: 100%; border-collapse: collapse; }
+.specs-table tr { border-bottom: 1px solid var(--border-dim); }
+.specs-table tr:last-child { border-bottom: none; }
+.specs-table td { padding: 10px 0; font-size: 13px; }
+.specs-table .spec-k { color: var(--text-muted); width: 42%; }
+.specs-table .spec-v { color: var(--text-primary); font-weight: 500; }
+
+.detail-footer {
+  padding: 20px 28px; border-top: 1px solid var(--border-dim);
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+.btn-ghost {
+  padding: 10px 20px; border-radius: 50px;
+  background: transparent; color: var(--text-secondary);
+  font-size: 13px; border: 1px solid var(--border-dim);
+  cursor: pointer; transition: all 0.25s var(--transition);
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--text-primary); }
+.btn-gold {
+  padding: 10px 24px; border-radius: 50px;
+  background: var(--gold); color: #0a0c10;
+  font-size: 13px; font-weight: 600; border: none;
+  cursor: pointer; transition: all 0.25s var(--transition);
+}
+.btn-gold:hover { background: var(--gold-light); transform: scale(1.04); }
+.btn-gold:active { transform: scale(0.97); }
+
+/* ── COMPARE MODAL ── */
+.compare-modal-box {
+  background: var(--dark-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  width: 100%; max-width: 960px; max-height: 88vh;
+  overflow-y: auto;
+  transform: translateY(30px) scale(0.97);
+  transition: transform 0.45s var(--transition);
+}
+.modal-overlay.open .compare-modal-box { transform: translateY(0) scale(1); }
+
+.compare-table { width: 100%; border-collapse: collapse; }
+.compare-table th, .compare-table td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border-dim); font-size: 14px; }
+.compare-table th { background: rgba(201,168,76,0.06); color: var(--gold); font-weight: 600; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+.compare-table td:first-child { color: var(--text-muted); font-size: 13px; }
+.compare-table td:not(:first-child) { color: var(--text-primary); font-weight: 500; }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-img-cell { text-align: center !important; padding-bottom: 8px !important; }
+.compare-img-cell img { width: 100%; height: 130px; object-fit: cover; border-radius: var(--radius-sm); }
+.compare-diff td:not(:first-child) { color: var(--gold-light) !important; }
+
+/* ── NO RESULTS ── */
+#noResults {
+  text-align: center; padding: 60px 20px; display: none;
+  color: var(--text-muted); font-size: 15px;
+}
+#noResults svg { width: 48px; height: 48px; margin: 0 auto 16px; display: block; opacity: 0.3; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes spinCog {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spin-cog { animation: spinCog 12s linear infinite; transform-origin: center; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark-base); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .hero-sub { font-size: 14px; }
+  #brandsRow { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+  #compareBar { width: calc(100% - 40px); flex-wrap: wrap; justify-content: center; border-radius: 18px; }
+}
+</style>
+
+<!-- ══════════════════════════════════════════
+     FONDO DECORATIVO: ENGRANAJES ANIMADOS
+     ══════════════════════════════════════════ -->
+
+<!-- Cuadrícula sutil -->
+<div class="bg-grid"></div>
+
+<!-- Orbes de luz difusa -->
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+
+<!-- Engranajes SVG animados en el fondo -->
+<div class="bg-gears">
+
+  <!-- ENGRANAJE 1 — Grande, esquina superior derecha, dorado -->
+  <svg xmlns="http://www.w3.org/2000/svg"
+       style="position:absolute; top:-120px; right:-120px; width:560px; height:560px; opacity:0.045;"
+       viewBox="0 0 200 200">
+    <g class="gear-cw-fast" style="transform-origin:100px 100px;">
+      <!-- Corona de dientes: 16 dientes -->
+      <path fill="#c9a84c" d="
+        M108,16 L112,28 A72,72 0 0 1 122,31 L133,24 L143,34 L136,45
+        A72,72 0 0 1 140,55 L152,58 L152,68 L140,71
+        A72,72 0 0 1 136,81 L143,92 L133,102 L122,95
+        A72,72 0 0 1 112,99 L108,111 L92,111 L88,99
+        A72,72 0 0 1 78,95 L67,102 L57,92 L64,81
+        A72,72 0 0 1 60,71 L48,68 L48,58 L60,55
+        A72,72 0 0 1 64,45 L57,34 L67,24 L78,31
+        A72,72 0 0 1 88,28 Z"/>
+      <!-- Círculo interior (hueco) -->
+      <circle cx="100" cy="63.5" r="0" fill="none"/>
+      <circle cx="100" cy="63.5" r="28" fill="#0a0c10"/>
+      <!-- Radio habla 1 -->
+      <rect x="97" y="36" width="6" height="55" rx="3" fill="#c9a84c" opacity="0.6"/>
+      <!-- Radio habla 2 -->
+      <rect x="97" y="36" width="6" height="55" rx="3" fill="#c9a84c" opacity="0.6" transform="rotate(60 100 63.5)"/>
+      <!-- Radio habla 3 -->
+      <rect x="97" y="36" width="6" height="55" rx="3" fill="#c9a84c" opacity="0.6" transform="rotate(120 100 63.5)"/>
+      <!-- Cubo central -->
+      <circle cx="100" cy="63.5" r="10" fill="#c9a84c" opacity="0.8"/>
+      <circle cx="100" cy="63.5" r="5"  fill="#0a0c10"/>
+    </g>
+  </svg>
+
+  <!-- ENGRANAJE 2 — Mediano, esquina inferior izquierda, acero -->
+  <svg xmlns="http://www.w3.org/2000/svg"
+       style="position:absolute; bottom:-90px; left:-90px; width:400px; height:400px; opacity:0.05;"
+       viewBox="0 0 200 200">
+    <g class="gear-ccw-med" style="transform-origin:100px 100px;">
+      <path fill="#8ba0b4" d="
+        M106,22 L110,32 A65,65 0 0 1 118,35 L128,29 L136,37 L130,47
+        A65,65 0 0 1 133,55 L144,58 L144,68 L133,71
+        A65,65 0 0 1 130,79 L136,89 L128,97 L118,91
+        A65,65 0 0 1 110,94 L106,104 L94,104 L90,94
+        A65,65 0 0 1 82,91 L72,97 L64,89 L70,79
+        A65,65 0 0 1 67,71 L56,68 L56,58 L67,55
+        A65,65 0 0 1 70,47 L64,37 L72,29 L82,35
+        A65,65 0 0 1 90,32 Z"/>
+      <circle cx="100" cy="63" r="24" fill="#0a0c10"/>
+      <rect x="97.5" y="39" width="5" height="48" rx="2.5" fill="#8ba0b4" opacity="0.5"/>
+      <rect x="97.5" y="39" width="5" height="48" rx="2.5" fill="#8ba0b4" opacity="0.5" transform="rotate(72 100 63)"/>
+      <rect x="97.5" y="39" width="5" height="48" rx="2.5" fill="#8ba0b4" opacity="0.5" transform="rotate(144 100 63)"/>
+      <rect x="97.5" y="39" width="5" height="48" rx="2.5" fill="#8ba0b4" opacity="0.5" transform="rotate(216 100 63)"/>
+      <rect x="97.5" y="39" width="5" height="48" rx="2.5" fill="#8ba0b4" opacity="0.5" transform="rotate(288 100 63)"/>
+      <circle cx="100" cy="63" r="9" fill="#8ba0b4" opacity="0.7"/>
+      <circle cx="100" cy="63" r="4"  fill="#0a0c10"/>
+    </g>
+  </svg>
+
+  <!-- ENGRANAJE 3 — Pequeño, lateral izquierdo centro, dorado -->
+  <svg xmlns="http://www.w3.org/2000/svg"
+       style="position:absolute; top:38%; left:-50px; width:240px; height:240px; opacity:0.04;"
+       viewBox="0 0 200 200">
+    <g class="gear-cw-slow" style="transform-origin:100px 100px;">
+      <path fill="#c9a84c" d="
+        M104,30 L107,39 A58,58 0 0 1 114,42 L122,37 L129,44 L124,52
+        A58,58 0 0 1 127,59 L136,62 L136,72 L127,75
+        A58,58 0 0 1 124,82 L129,90 L122,97 L114,92
+        A58,58 0 0 1 107,95 L104,104 L96,104 L93,95
+        A58,58 0 0 1 86,92 L78,97 L71,90 L76,82
+        A58,58 0 0 1 73,75 L64,72 L64,62 L73,59
+        A58,58 0 0 1 76,52 L71,44 L78,37 L86,42
+        A58,58 0 0 1 93,39 Z"/>
+      <circle cx="100" cy="67" r="20" fill="#0a0c10"/>
+      <rect x="98" y="47" width="4" height="40" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(0 100 67)"/>
+      <rect x="98" y="47" width="4" height="40" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(90 100 67)"/>
+      <rect x="98" y="47" width="4" height="40" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(45 100 67)"/>
+      <rect x="98" y="47" width="4" height="40" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(135 100 67)"/>
+      <circle cx="100" cy="67" r="7" fill="#c9a84c" opacity="0.6"/>
+      <circle cx="100" cy="67" r="3" fill="#0a0c10"/>
+    </g>
+  </svg>
+
+  <!-- ENGRANAJE 4 — Pequeño, lateral derecho, acero -->
+  <svg xmlns="http://www.w3.org/2000/svg"
+       style="position:absolute; top:60%; right:-40px; width:200px; height:200px; opacity:0.04;"
+       viewBox="0 0 200 200">
+    <g class="gear-ccw-slow" style="transform-origin:100px 100px;">
+      <path fill="#8ba0b4" d="
+        M104,35 L107,43 A55,55 0 0 1 113,46 L120,41 L127,48 L122,55
+        A55,55 0 0 1 125,62 L133,65 L133,75 L125,78
+        A55,55 0 0 1 122,85 L127,92 L120,99 L113,94
+        A55,55 0 0 1 107,97 L104,105 L96,105 L93,97
+        A55,55 0 0 1 87,94 L80,99 L73,92 L78,85
+        A55,55 0 0 1 75,78 L67,75 L67,65 L75,62
+        A55,55 0 0 1 78,55 L73,48 L80,41 L87,46
+        A55,55 0 0 1 93,43 Z"/>
+      <circle cx="100" cy="70" r="19" fill="#0a0c10"/>
+      <rect x="98.5" y="51" width="3" height="38" rx="1.5" fill="#8ba0b4" opacity="0.5" transform="rotate(0 100 70)"/>
+      <rect x="98.5" y="51" width="3" height="38" rx="1.5" fill="#8ba0b4" opacity="0.5" transform="rotate(60 100 70)"/>
+      <rect x="98.5" y="51" width="3" height="38" rx="1.5" fill="#8ba0b4" opacity="0.5" transform="rotate(120 100 70)"/>
+      <circle cx="100" cy="70" r="7" fill="#8ba0b4" opacity="0.6"/>
+      <circle cx="100" cy="70" r="3" fill="#0a0c10"/>
+    </g>
+  </svg>
+
+  <!-- ENGRANAJE 5 — Diminuto, centro superior, acero muy sutil -->
+  <svg xmlns="http://www.w3.org/2000/svg"
+       style="position:absolute; top:15%; left:42%; width:120px; height:120px; opacity:0.03;"
+       viewBox="0 0 200 200">
+    <g class="gear-cw-xslow" style="transform-origin:100px 100px;">
+      <path fill="#c9a84c" d="
+        M105,40 L108,48 A50,50 0 0 1 113,51 L120,47 L126,53 L122,60
+        A50,50 0 0 1 124,66 L132,69 L132,77 L124,80
+        A50,50 0 0 1 122,86 L126,93 L120,99 L113,95
+        A50,50 0 0 1 108,98 L105,106 L95,106 L92,98
+        A50,50 0 0 1 87,95 L80,99 L74,93 L78,86
+        A50,50 0 0 1 76,80 L68,77 L68,69 L76,66
+        A50,50 0 0 1 78,60 L74,53 L80,47 L87,51
+        A50,50 0 0 1 92,48 Z"/>
+      <circle cx="100" cy="73" r="18" fill="#0a0c10"/>
+      <rect x="98.5" y="55" width="3" height="36" rx="1.5" fill="#c9a84c" opacity="0.5" transform="rotate(0 100 73)"/>
+      <rect x="98.5" y="55" width="3" height="36" rx="1.5" fill="#c9a84c" opacity="0.5" transform="rotate(90 100 73)"/>
+      <circle cx="100" cy="73" r="6" fill="#c9a84c" opacity="0.5"/>
+      <circle cx="100" cy="73" r="2.5" fill="#0a0c10"/>
+    </g>
+  </svg>
+
+</div>
+
+<!-- Líneas de ejes / cardanes decorativas -->
+<div class="bg-shafts">
+  <svg xmlns="http://www.w3.org/2000/svg"
+       style="position:absolute; inset:0; width:100%; height:100%;"
+       preserveAspectRatio="none">
+
+    <!-- Eje diagonal principal (simula árbol de transmisión) -->
+    <line x1="-2%" y1="28%" x2="35%" y2="72%"
+          stroke="rgba(201,168,76,0.06)" stroke-width="1.5"/>
+
+    <!-- Eje secundario derecho -->
+    <line x1="65%" y1="5%" x2="102%" y2="58%"
+          stroke="rgba(139,160,180,0.055)" stroke-width="1.5"/>
+
+    <!-- Eje corto inferior izquierdo -->
+    <line x1="15%" y1="88%" x2="52%" y2="54%"
+          stroke="rgba(201,168,76,0.045)" stroke-width="1"/>
+
+    <!-- Eje corto superior derecho -->
+    <line x1="78%" y1="82%" x2="106%" y2="28%"
+          stroke="rgba(139,160,180,0.04)" stroke-width="1"/>
+
+    <!-- Eje horizontal central punteado (línea de transmisión) -->
+    <line x1="0%" y1="50%" x2="100%" y2="50%"
+          stroke="rgba(201,168,76,0.03)" stroke-width="1"
+          stroke-dasharray="14 22"/>
+
+    <!-- Línea de eje vertical (columna de transmisión) -->
+    <line x1="50%" y1="0%" x2="50%" y2="100%"
+          stroke="rgba(139,160,180,0.025)" stroke-width="1"
+          stroke-dasharray="10 28"/>
+
+    <!-- Pequeños marcadores de cruceta en intersecciones de ejes -->
+    <circle cx="50%" cy="50%" r="4"
+            fill="none" stroke="rgba(201,168,76,0.06)" stroke-width="1"/>
+  </svg>
+</div>
+<!-- ══════════════ FIN FONDO ══════════════ -->
+
+
+<div class="page-wrap">
+  <div class="container py-4">
+
+    <a href="{{ url_for('index') }}" class="btn-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Volver al inicio
+    </a>
+
+    <!-- Hero -->
+    <div class="hero-header">
+      <div class="hero-eyebrow">
+        <svg class="spin-cog" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;color:var(--gold)"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.622 10.395l-1.097-2.65L20 6l-2-2-1.735 1.483-2.707-1.113L12.935 2h-1.954l-.632 2.401-2.645 1.115L6 4 4 6l1.453 1.789-1.08 2.657L2 11v2l2.401.656L5.516 16.3 4 18l2 2 1.791-1.46 2.606 1.072L11 22h2l.604-2.419 2.64-1.115L18 20l2-2-1.466-1.735 1.094-2.584L22 13v-2l-2.378-.605z"/></svg>
+        Catálogo de Transmisiones
+      </div>
+      <h1 class="hero-title">Alto<br>Rendimiento</h1>
+      <p class="hero-sub">Las transmisiones más avanzadas de la industria. Selecciona una marca para explorar sus modelos y especificaciones técnicas completas.</p>
+    </div>
+
+    <!-- Search & Filters -->
+    <div class="controls-bar">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Buscar transmisión por nombre o tipo…" autocomplete="off" aria-label="Buscar transmisiones">
+      </div>
+      <div class="filter-chips" role="group" aria-label="Filtros por tipo">
+        <span class="filter-chip active" data-filter="all">Todos</span>
+        <span class="filter-chip" data-filter="Manual">Manual</span>
+        <span class="filter-chip" data-filter="Automatica">Automática</span>
+        <span class="filter-chip" data-filter="AMT">AMT</span>
+        <span class="filter-chip" data-filter="mineria">Minería</span>
+        <span class="filter-chip" data-filter="carretera">Carretera</span>
+        <span class="filter-chip" data-filter="urbano">Urbano</span>
+      </div>
+    </div>
+
+    <!-- No results -->
+    <div id="noResults">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6"/></svg>
+      No se encontraron transmisiones con ese criterio.
+    </div>
+
+    <!-- Brand Cards -->
+    <div id="brandsRow" role="list">
+      {% set brands_data = [
+        {"name": "Eaton Fuller", "count": 5, "type": "Manual"},
+        {"name": "Allison", "count": 4, "type": "Automatica"},
+        {"name": "MaxiTorque", "count": 4, "type": "Manual"},
+        {"name": "Volvo I-Shift", "count": 4, "type": "AMT"},
+        {"name": "Mack mDrive", "count": 3, "type": "AMT"}
+      ] %}
+      {% for b in brands_data %}
+      <div class="brand-card" role="listitem" tabindex="0"
+           data-brand="{{ b.name }}" data-type="{{ b.type }}"
+           data-search="{{ b.name | lower }}">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.622 10.395l-1.097-2.65L20 6l-2-2-1.735 1.483-2.707-1.113L12.935 2h-1.954l-.632 2.401-2.645 1.115L6 4 4 6l1.453 1.789-1.08 2.657L2 11v2l2.401.656L5.516 16.3 4 18l2 2 1.791-1.46 2.606 1.072L11 22h2l.604-2.419 2.64-1.115L18 20l2-2-1.466-1.735 1.094-2.584L22 13v-2l-2.378-.605z"/></svg>
+        </div>
+        <div class="card-title">{{ b.name }}</div>
+        <div class="card-count">{{ b.count }} modelos · {{ b.type }}</div>
+        <div class="card-arrow">
+          Explorar
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<!-- ── COMPARE BAR ── -->
+<div id="compareBar" aria-live="polite">
+  <span class="compare-label">Comparando</span>
+  <span class="compare-count" id="compareCount">0</span>
+  <span class="compare-label">modelos</span>
+  <button class="btn-compare-now" id="btnCompareNow">Ver comparación</button>
+  <button class="btn-compare-clear" id="btnCompareClear">Limpiar</button>
+</div>
+
+<!-- ── MODAL: BRAND MODELS ── -->
+<div class="modal-overlay" id="brandOverlay" role="dialog" aria-modal="true" aria-label="Modelos de transmisión">
+  <div class="brand-modal-box" id="brandModalBox">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-hdr-title" id="brandModalTitle">Marca</div>
+        <div class="modal-hdr-sub" id="brandModalSub">Selecciona un modelo para ver detalles</div>
+      </div>
+      <button class="btn-close-modal" id="closeBrandModal" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="models-grid" id="modelsGrid"></div>
+  </div>
+</div>
+
+<!-- ── MODAL: DETAIL ── -->
+<div class="modal-overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-label="Especificaciones técnicas">
+  <div class="detail-modal-box" id="detailModalBox">
+    <div class="detail-inner">
+      <div class="detail-img-col">
+        <img id="detailImage" src="" alt="" loading="lazy">
+        <div class="img-zoom-hint">Mueve el cursor para zoom</div>
+        <div class="nav-arrows">
+          <button class="nav-btn" id="prevModel" title="Modelo anterior" aria-label="Modelo anterior">←</button>
+          <button class="nav-btn" id="nextModel" title="Modelo siguiente" aria-label="Modelo siguiente">→</button>
+        </div>
+      </div>
+      <div class="detail-info-col">
+        <div class="detail-brand-badge" id="detailBrand">Marca</div>
+        <div id="detailName">Nombre del modelo</div>
+        <p id="detailDesc">Descripción</p>
+        <table class="specs-table" id="specsTable"></table>
+      </div>
+    </div>
+    <div class="detail-footer">
+      <button class="btn-ghost" id="closeDetailModal">Cerrar</button>
+      <button class="btn-gold" id="addToCompareBtn">+ Agregar a comparación</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: COMPARISON ── -->
+<div class="modal-overlay" id="compareOverlay" role="dialog" aria-modal="true" aria-label="Comparación de transmisiones">
+  <div class="compare-modal-box">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-hdr-title">Comparación Técnica</div>
+        <div class="modal-hdr-sub">Especificaciones lado a lado</div>
+      </div>
+      <button class="btn-close-modal" id="closeCompareModal" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="padding:24px 28px;overflow-x:auto;">
+      <table class="compare-table" id="compareTable"></table>
+    </div>
+  </div>
+</div>
+
+<!-- ── DATA ── -->
+<script>
+const transmissionsData = {
+  "Eaton Fuller": {
+    models: [
+      { id:"eaton_18", name:"Eaton Fuller 18-Speed", img:"{{ url_for('static', filename='img/transmissions/Eaton Fuller 18 speed.jpg') }}", description:"La Eaton Fuller de 18 velocidades combina 4 marchas principales, selector de rango High/Low y splitter, alcanzando 18 combinaciones hacia adelante y 4 en reversa. Es referencia en transporte de larga distancia por su versatilidad en pendientes y cargas pesadas.", specs:{ "Tipo":"Manual","Velocidades":"18","Uso":"Larga distancia","Peso":"320 kg / 705 lb" } },
+      { id:"eaton_10", name:"Eaton Fuller 10-Speed", img:"{{ url_for('static', filename='img/transmissions/Eaton Fuller 10.jpg') }}", description:"Transmisión manual clásica con 5 marchas en H y selector de rango High/Low. Sólida y confiable para flotas regionales que requieren equilibrio entre potencia y facilidad de operación.", specs:{ "Tipo":"Manual","Velocidades":"10","Uso":"Carga regional","Peso":"285 kg / 630 lb" } },
+      { id:"eaton_13", name:"Eaton Fuller 13-Speed", img:"{{ url_for('static', filename='img/transmissions/Eaton Fuller 13.jpg') }}", description:"Combina cuatro marchas principales, rango alto/bajo y divisor para 13 combinaciones. Ideal cuando se necesita más granularidad que una 10 velocidades sin la complejidad de una 18.", specs:{ "Tipo":"Manual","Velocidades":"13","Uso":"Carga regional","Peso":"~290 kg / 640 lb" } },
+      { id:"eaton_super10", name:"Eaton Fuller Super 10", img:"{{ url_for('static', filename='img/transmissions/Eaton Fuller super 10.jpg') }}", description:"Patrón simple de 5 marchas en H donde cada marcha se divide en baja/alta con el botón splitter. Mayor facilidad de operación respecto a la 10 convencional manteniendo la misma capacidad.", specs:{ "Tipo":"Manual","Velocidades":"10","Uso":"Carga regional","Peso":"~290 kg / 640 lb" } },
+      { id:"eaton_8", name:"Eaton Fuller 8-Speed", img:"{{ url_for('static', filename='img/transmissions/Eaton Fuller 8.jpg') }}", description:"Para camiones medianos y pesados que necesitan fuerza sin complejidad. Patrón en H con cuatro marchas y selector de rango. Mínima curva de aprendizaje para operadores nuevos.", specs:{ "Tipo":"Manual","Velocidades":"8","Uso":"Carga local","Peso":"~280 kg / 617 lb" } }
+    ]
+  },
+  "Allison": {
+    models: [
+      { id:"allison_4000", name:"Allison 4000 Series", img:"{{ url_for('static', filename='img/transmissions/Allison 4000 series 6.jpg') }}", description:"Transmisión automática de servicio pesado con convertidor de par y controles electrónicos. Cambios suaves y sin interrupción de potencia. Usada en camiones, buses, construcción y aplicaciones militares.", specs:{ "Tipo":"Automática","Velocidades":"6–7","Uso":"Buses y camiones pesados","Peso":"390 kg / 860 lb" } },
+      { id:"allison_3000", name:"Allison 3000 Series", img:"{{ url_for('static', filename='img/transmissions/Allison 3000 series.jpg') }}", description:"Ideal para camiones de reparto y buses urbanos. Convertidor de par para arranques suaves con carga pesada. Arquitectura probada en servicios públicos y construcción ligera.", specs:{ "Tipo":"Automática","Velocidades":"5–6","Uso":"Camiones medianos / buses","Peso":"330 kg / 730 lb" } },
+      { id:"allison_2000", name:"Allison 2000 Series", img:"{{ url_for('static', filename='img/transmissions/Allison 2000 series.jpg') }}", description:"Para servicio mediano: reparto, buses escolares, ambulancias. 5 velocidades con modo económico. Popular en flotas de emergencia por su fiabilidad y bajo mantenimiento.", specs:{ "Tipo":"Automática","Velocidades":"5","Uso":"Reparto / emergencias","Peso":"290 kg / 640 lb" } },
+      { id:"allison_1000", name:"Allison 1000 Series", img:"{{ url_for('static', filename='img/transmissions/Allison 1000 series.jpg') }}", description:"Compacta para pickups pesadas y comerciales ligeros. Popular en Silverado HD y Sierra HD. 6 velocidades con gestión térmica avanzada y modo tow/haul.", specs:{ "Tipo":"Automática","Velocidades":"6","Uso":"Pickups pesadas","Peso":"215 kg / 475 lb" } }
+    ]
+  },
+  "MaxiTorque": {
+    models: [
+      { id:"maxitorque_T310", name:"MaxiTorque T310", img:"{{ url_for('static', filename='img/transmissions/MaxiTorque T310.jpg') }}", description:"Manual de 10 velocidades para trabajo pesado en condiciones severas. Engranajes endurecidos y sincronizadores reforzados. Popular en construcción, minería y transporte pesado en Latinoamérica.", specs:{ "Tipo":"Manual","Velocidades":"10","Uso":"Construcción / minería","Peso":"~300 kg / 660 lb" } },
+      { id:"maxitorque_T2180", name:"MaxiTorque T2180", img:"{{ url_for('static', filename='img/transmissions/MaxiTorque T2180.jpg') }}", description:"Manual de alta velocidad diseñada para alto torque. Lubricación optimizada y operación confiable en construcción, minería y cargas extremas. Construcción robusta para vida útil extendida.", specs:{ "Tipo":"Manual","Velocidades":"12","Uso":"Construcción pesada","Peso":"~320 kg / 705 lb" } },
+      { id:"maxitorque_T313", name:"MaxiTorque T313", img:"{{ url_for('static', filename='img/transmissions/Maxitorque T313.jpg') }}", description:"13 velocidades diseñadas para alto torque y condiciones severas. Gran durabilidad, diseño robusto y sistema de lubricación optimizado. Excelente para minería, construcción y transporte vocacional.", specs:{ "Tipo":"Manual","Velocidades":"13","Uso":"Minería / cargas extremas","Peso":"~358 kg / 790 lb" } },
+      { id:"maxitorque_T308", name:"MaxiTorque T308", img:"{{ url_for('static', filename='img/transmissions/Maxitorque T308.jpg') }}", description:"8 velocidades para trabajo medio y pesado. Balance entre simplicidad, durabilidad y eficiencia. Ideal para vehículos comerciales y equipos de construcción con cargas moderadas.", specs:{ "Tipo":"Manual","Velocidades":"8","Uso":"Reparto regional / urbano","Peso":"~270 kg / 595 lb" } }
+    ]
+  },
+  "Volvo I-Shift": {
+    models: [
+      { id:"volvo_12", name:"Volvo I-Shift 12-Speed", img:"{{ url_for('static', filename='img/transmissions/volvo i-shift 12 speed.jpg') }}", description:"AMT de 12 velocidades con control electrónico avanzado. Sensores optimizan cambios según carga, pendiente y estilo de conducción. Referencia mundial en eficiencia de combustible.", specs:{ "Tipo":"AMT","Velocidades":"12","Uso":"Larga distancia","Peso":"~390 kg / 860 lb" } },
+      { id:"volvo_hd", name:"Volvo I-Shift HD", img:"{{ url_for('static', filename='img/transmissions/Volvo i-Shift HD.jpg') }}", description:"Versión Heavy Duty para aplicaciones fuera de carretera, minería y construcción. Embrague reforzado y engranajes de mayor resistencia con modos para arranque en pendientes pronunciadas.", specs:{ "Tipo":"AMT","Velocidades":"12","Uso":"Minería / construcción","Torque":"3200 Nm" } },
+      { id:"volvo_dc", name:"Volvo I-Shift Dual Clutch", img:"{{ url_for('static', filename='img/transmissions/Volvo I-Shift Dual Clutch.jpg') }}", description:"Doble embrague con cambios sin interrupción de potencia. Cada embrague maneja velocidades alternas, pre-seleccionando la siguiente para cambios instantáneos. Máximo confort en carretera.", specs:{ "Tipo":"AMT DCT","Velocidades":"12","Uso":"Larga distancia premium","Peso":"~420 kg / 925 lb" } },
+      { id:"volvo_crawler", name:"Volvo I-Shift Crawler", img:"{{ url_for('static', filename='img/transmissions/Volvo I-Shift Crawler.jpg') }}", description:"Versión con marchas ultrabajas para arranque con cargas extremas o en pendientes severas. Las marchas crawler ofrecen reducción extra para máximo torque a velocidades mínimas.", specs:{ "Tipo":"AMT","Velocidades":"12 + 2 Crawler","Uso":"Construcción extrema","Peso":"~400 kg / 880 lb" } }
+    ]
+  },
+  "Mack mDrive": {
+    models: [
+      { id:"mack_12", name:"Mack mDRIVE 12-Speed", img:"{{ url_for('static', filename='img/transmissions/Mack mDrive 12.jpg') }}", description:"AMT optimizada para camiones Mack con modos: económico, estándar, rendimiento y manual. Sistema de predicción de pendientes para cambios anticipados y ahorro de combustible.", specs:{ "Tipo":"AMT","Velocidades":"12","Uso":"Transporte pesado larga dist.","Peso":"~380 kg / 840 lb" } },
+      { id:"mack_hd", name:"Mack mDRIVE HD", img:"{{ url_for('static', filename='img/transmissions/Mack mDrive HD.jpg') }}", description:"Heavy Duty para minería, construcción y terrenos difíciles. Embrague reforzado y carcasa robusta. Modo off-road con control de tracción mejorado para condiciones extremas.", specs:{ "Tipo":"AMT","Velocidades":"13","Uso":"Aplicaciones extremas","Torque":"2850 Nm" } },
+      { id:"mack_hdplus", name:"Mack mDRIVE HD+", img:"{{ url_for('static', filename='img/transmissions/Mack mDrive HD Plus.jpg') }}", description:"La versión más robusta de la familia mDRIVE. Para minería y sobrecargas. Sistema de enfriamiento mejorado y protecciones adicionales contra impactos y vibraciones severas.", specs:{ "Tipo":"AMT","Velocidades":"13","Uso":"Minería / sobrecargas","Torque":"3100 Nm" } }
+    ]
+  }
+};
+</script>
+
+<!-- ── MAIN SCRIPT ── -->
+<script>
+(function() {
+
+// ── STATE ──
+let currentBrand = null;
+let currentModelIndex = 0;
+let currentBrandModels = [];
+let compareList = [];
+
+// ── ELEMENT REFS ──
+const brandOverlay   = document.getElementById('brandOverlay');
+const brandModalBox  = document.getElementById('brandModalBox');
+const brandModalTitle= document.getElementById('brandModalTitle');
+const brandModalSub  = document.getElementById('brandModalSub');
+const modelsGrid     = document.getElementById('modelsGrid');
+const closeBrandBtn  = document.getElementById('closeBrandModal');
+
+const detailOverlay  = document.getElementById('detailOverlay');
+const detailImage    = document.getElementById('detailImage');
+const detailBrand    = document.getElementById('detailBrand');
+const detailName     = document.getElementById('detailName');
+const detailDesc     = document.getElementById('detailDesc');
+const specsTable     = document.getElementById('specsTable');
+const closeDetailBtn = document.getElementById('closeDetailModal');
+const prevBtn        = document.getElementById('prevModel');
+const nextBtn        = document.getElementById('nextModel');
+const addCompareBtn  = document.getElementById('addToCompareBtn');
+
+const compareOverlay = document.getElementById('compareOverlay');
+const compareTable   = document.getElementById('compareTable');
+const closeCompareBtn= document.getElementById('closeCompareModal');
+const compareBar     = document.getElementById('compareBar');
+const compareCount   = document.getElementById('compareCount');
+const btnCompareNow  = document.getElementById('btnCompareNow');
+const btnCompareClear= document.getElementById('btnCompareClear');
+
+const searchInput    = document.getElementById('searchInput');
+const filterChips    = document.querySelectorAll('.filter-chip');
+const noResults      = document.getElementById('noResults');
+const brandsRow      = document.getElementById('brandsRow');
+
+// ── OPEN / CLOSE OVERLAYS ──
+function openOverlay(el) {
+  el.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeOverlay(el) {
+  el.classList.remove('open');
+  if (!brandOverlay.classList.contains('open') &&
+      !detailOverlay.classList.contains('open') &&
+      !compareOverlay.classList.contains('open')) {
+    document.body.style.overflow = '';
+  }
+}
+
+// ── BRAND MODAL ──
+function openBrandModal(brand) {
+  currentBrand = brand;
+  const data = transmissionsData[brand];
+  if (!data) return;
+  brandModalTitle.textContent = brand;
+  brandModalSub.textContent = data.models.length + ' modelos disponibles — haz clic para ver detalles';
+  modelsGrid.innerHTML = '';
+
+  data.models.forEach((model, i) => {
+    const alreadyCompare = compareList.some(c => c.model.id === model.id);
+    const col = document.createElement('div');
+    col.innerHTML = `
+      <div class="model-thumb" data-brand="${brand}" data-idx="${i}" tabindex="0" role="button" aria-label="${model.name}">
+        <div class="compare-check-wrap">
+          <div class="compare-check ${alreadyCompare ? 'checked' : ''}" data-idx="${i}" title="Agregar a comparación">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+        <div class="model-thumb-img-wrap">
+          <img src="${model.img}" alt="${model.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x140/1a1f2e/8ba0b4?text=Sin+imagen'">
+          <div class="model-preview">
+            <span class="preview-tag">${model.specs['Tipo'] || ''}</span>
+            <div class="preview-spec">
+              <strong>Velocidades:</strong> ${model.specs['Velocidades'] || '—'}<br>
+              <strong>Uso:</strong> ${model.specs['Uso'] || '—'}
+            </div>
+          </div>
+        </div>
+        <div class="model-thumb-body">
+          <div class="model-thumb-name">${model.name}</div>
+        </div>
+      </div>`;
+    col.style.animation = `fadeUp 0.5s cubic-bezier(0.23,1,0.32,1) ${i * 0.06}s both`;
+    modelsGrid.appendChild(col);
+  });
+
+  modelsGrid.querySelectorAll('.model-thumb').forEach(thumb => {
+    thumb.addEventListener('click', e => {
+      if (e.target.closest('.compare-check')) return;
+      const idx = parseInt(thumb.dataset.idx);
+      openDetailModal(brand, idx);
+    });
+    thumb.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        const idx = parseInt(thumb.dataset.idx);
+        openDetailModal(brand, idx);
+      }
+    });
+  });
+
+  modelsGrid.querySelectorAll('.compare-check').forEach(cb => {
+    cb.addEventListener('click', e => {
+      e.stopPropagation();
+      const idx = parseInt(cb.dataset.idx);
+      const model = transmissionsData[brand].models[idx];
+      toggleCompare(brand, model, cb);
+    });
+  });
+
+  openOverlay(brandOverlay);
+}
+
+// ── DETAIL MODAL ──
+function openDetailModal(brand, idx) {
+  currentBrand = brand;
+  currentBrandModels = transmissionsData[brand].models;
+  currentModelIndex = idx;
+  renderDetail();
+  closeOverlay(brandOverlay);
+  setTimeout(() => openOverlay(detailOverlay), 320);
+}
+
+function renderDetail() {
+  const model = currentBrandModels[currentModelIndex];
+  detailBrand.textContent = currentBrand;
+  detailName.textContent = model.name;
+  detailDesc.textContent = model.description;
+  detailImage.src = model.img;
+  detailImage.alt = model.name;
+  detailImage.style.transform = 'scale(1)';
+
+  specsTable.innerHTML = '';
+  Object.entries(model.specs).forEach(([k, v]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="spec-k">${k}</td><td class="spec-v">${v}</td>`;
+    specsTable.appendChild(tr);
+  });
+
+  const inCompare = compareList.some(c => c.model.id === model.id);
+  addCompareBtn.textContent = inCompare ? '✓ En comparación' : '+ Agregar a comparación';
+  addCompareBtn.style.background = inCompare ? '#2d5a27' : 'var(--gold)';
+  addCompareBtn.style.color = inCompare ? '#a8e6a3' : '#0a0c10';
+
+  prevBtn.disabled = currentModelIndex === 0;
+  nextBtn.disabled = currentModelIndex === currentBrandModels.length - 1;
+  prevBtn.style.opacity = prevBtn.disabled ? '0.35' : '1';
+  nextBtn.style.opacity = nextBtn.disabled ? '0.35' : '1';
+}
+
+prevBtn.addEventListener('click', () => {
+  if (currentModelIndex > 0) { currentModelIndex--; renderDetail(); }
+});
+nextBtn.addEventListener('click', () => {
+  if (currentModelIndex < currentBrandModels.length - 1) { currentModelIndex++; renderDetail(); }
+});
+
+addCompareBtn.addEventListener('click', () => {
+  const model = currentBrandModels[currentModelIndex];
+  const inCompare = compareList.some(c => c.model.id === model.id);
+  if (inCompare) {
+    compareList = compareList.filter(c => c.model.id !== model.id);
+  } else {
+    if (compareList.length >= 4) { alert('Máximo 4 transmisiones a comparar.'); return; }
+    compareList.push({ brand: currentBrand, model });
+  }
+  renderDetail();
+  updateCompareBar();
+});
+
+// ── COMPARE ──
+function toggleCompare(brand, model, checkEl) {
+  const inList = compareList.some(c => c.model.id === model.id);
+  if (inList) {
+    compareList = compareList.filter(c => c.model.id !== model.id);
+    checkEl.classList.remove('checked');
+  } else {
+    if (compareList.length >= 4) { alert('Máximo 4 transmisiones a comparar.'); return; }
+    compareList.push({ brand, model });
+    checkEl.classList.add('checked');
+  }
+  updateCompareBar();
+}
+
+function updateCompareBar() {
+  compareCount.textContent = compareList.length;
+  compareBar.classList.toggle('visible', compareList.length >= 2);
+}
+
+function openCompareModal() {
+  if (compareList.length < 2) return;
+  buildCompareTable();
+  openOverlay(compareOverlay);
+}
+
+function buildCompareTable() {
+  const models = compareList.map(c => c.model);
+  const brands = compareList.map(c => c.brand);
+  const allKeys = ['Tipo','Velocidades','Uso','Peso','Torque'];
+
+  let html = '<thead><tr><th>Especificación</th>';
+  models.forEach((m, i) => { html += `<th>${brands[i]}<br><span style="font-weight:400;font-size:11px;color:var(--text-secondary)">${m.name}</span></th>`; });
+  html += '</tr></thead><tbody>';
+
+  html += '<tr><td class="compare-img-cell" style="color:var(--text-muted);font-size:13px">Vista</td>';
+  models.forEach(m => { html += `<td class="compare-img-cell"><img src="${m.img}" alt="${m.name}" onerror="this.src='https://via.placeholder.com/200x130/1a1f2e/8ba0b4?text=—'"></td>`; });
+  html += '</tr>';
+
+  allKeys.forEach(key => {
+    const vals = models.map(m => m.specs[key] || '—');
+    const allSame = vals.every(v => v === vals[0]);
+    const rowClass = !allSame ? ' class="compare-diff"' : '';
+    html += `<tr${rowClass}><td>${key}</td>`;
+    vals.forEach(v => { html += `<td>${v}</td>`; });
+    html += '</tr>';
+  });
+
+  html += '</tbody>';
+  compareTable.innerHTML = html;
+}
+
+btnCompareNow.addEventListener('click', () => {
+  closeOverlay(brandOverlay);
+  openCompareModal();
+});
+btnCompareClear.addEventListener('click', () => {
+  compareList = [];
+  updateCompareBar();
+  document.querySelectorAll('.compare-check').forEach(c => c.classList.remove('checked'));
+});
+closeCompareBtn.addEventListener('click', () => closeOverlay(compareOverlay));
+
+// ── CLOSE BUTTONS ──
+closeBrandBtn.addEventListener('click', () => closeOverlay(brandOverlay));
+closeDetailBtn.addEventListener('click', () => {
+  closeOverlay(detailOverlay);
+  setTimeout(() => openOverlay(brandOverlay), 300);
+});
+
+[brandOverlay, detailOverlay, compareOverlay].forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeOverlay(overlay);
+  });
+});
+
+// ── BRAND CARDS ──
+document.querySelectorAll('.brand-card').forEach(card => {
+  card.addEventListener('click', () => openBrandModal(card.dataset.brand));
+  card.addEventListener('keypress', e => { if (e.key === 'Enter') openBrandModal(card.dataset.brand); });
+});
+
+// ── 3D TILT ──
+document.querySelectorAll('.brand-card').forEach(card => {
+  let raf = null;
+  card.addEventListener('mousemove', e => {
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      const rotX = (0.5 - y) * 14;
+      const rotY = (x - 0.5) * 14;
+      card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+      card.style.setProperty('--mx', (x * 100) + '%');
+      card.style.setProperty('--my', (y * 100) + '%');
+    });
+  });
+  card.addEventListener('mouseleave', () => {
+    if (raf) cancelAnimationFrame(raf);
+    card.style.transform = '';
+  });
+});
+
+// ── IMAGE ZOOM ──
+const detailImgCol = document.querySelector('.detail-img-col');
+detailImgCol.addEventListener('mousemove', e => {
+  const rect = detailImgCol.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1) + '%';
+  const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1) + '%';
+  detailImage.style.transformOrigin = `${x} ${y}`;
+  detailImage.style.transform = 'scale(1.55)';
+});
+detailImgCol.addEventListener('mouseleave', () => {
+  detailImage.style.transform = 'scale(1)';
+  detailImage.style.transformOrigin = '50% 50%';
+});
+
+// ── KEYBOARD NAVIGATION ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (compareOverlay.classList.contains('open')) { closeOverlay(compareOverlay); return; }
+    if (detailOverlay.classList.contains('open')) {
+      closeOverlay(detailOverlay);
+      setTimeout(() => openOverlay(brandOverlay), 300);
+      return;
+    }
+    if (brandOverlay.classList.contains('open')) { closeOverlay(brandOverlay); return; }
+  }
+  if (detailOverlay.classList.contains('open')) {
+    if (e.key === 'ArrowLeft' && currentModelIndex > 0) { currentModelIndex--; renderDetail(); }
+    if (e.key === 'ArrowRight' && currentModelIndex < currentBrandModels.length - 1) { currentModelIndex++; renderDetail(); }
+  }
+});
+
+// ── SEARCH & FILTER ──
+let activeFilter = 'all';
+const filterMap = {
+  'Manual':     c => c.dataset.type === 'Manual',
+  'Automatica': c => c.dataset.type === 'Automatica',
+  'AMT':        c => c.dataset.type === 'AMT',
+  'mineria':    c => {
+    const brand = c.dataset.brand;
+    const d = transmissionsData[brand];
+    return d && d.models.some(m => (m.specs['Uso']||'').toLowerCase().includes('miner'));
+  },
+  'carretera':  c => {
+    const brand = c.dataset.brand;
+    const d = transmissionsData[brand];
+    return d && d.models.some(m => (m.specs['Uso']||'').toLowerCase().includes('distancia') || (m.specs['Uso']||'').toLowerCase().includes('carretera'));
+  },
+  'urbano':     c => {
+    const brand = c.dataset.brand;
+    const d = transmissionsData[brand];
+    return d && d.models.some(m => (m.specs['Uso']||'').toLowerCase().includes('urban') || (m.specs['Uso']||'').toLowerCase().includes('reparto'));
+  }
+};
+
+function applyFilters() {
+  const query = searchInput.value.toLowerCase().trim();
+  const cards = document.querySelectorAll('.brand-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const matchSearch = !query || card.dataset.search.includes(query) || card.querySelector('.card-title').textContent.toLowerCase().includes(query);
+    const matchFilter = activeFilter === 'all' || (filterMap[activeFilter] && filterMap[activeFilter](card));
+    const show = matchSearch && matchFilter;
+    card.classList.toggle('hidden', !show);
+    if (show) visible++;
+  });
+  noResults.style.display = visible === 0 ? 'block' : 'none';
+}
+
+searchInput.addEventListener('input', applyFilters);
+
+filterChips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    filterChips.forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.filter;
+    applyFilters();
+  });
+});
+
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('revealed');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.brand-card').forEach((card, i) => {
+  card.style.transitionDelay = (i * 0.08) + 's';
+  observer.observe(card);
+});
+
+// ── BUTTON CLICK FEEDBACK ──
+document.querySelectorAll('button, .filter-chip, .brand-card').forEach(el => {
+  el.addEventListener('mousedown', () => { el.style.transform = (el.style.transform || '') + ' scale(0.97)'; });
+  el.addEventListener('mouseup',   () => { el.style.transform = el.style.transform.replace(' scale(0.97)', ''); });
+});
+
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

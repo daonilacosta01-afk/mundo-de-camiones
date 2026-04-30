@@ -1,0 +1,1221 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Patrón de fondo sutil */
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            radial-gradient(circle at 20% 50%, rgba(241, 196, 15, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(52, 152, 219, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Animaciones */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Header Principal */
+    .main-header {
+        background: linear-gradient(135deg, rgba(241, 196, 15, 0.2) 0%, rgba(230, 126, 34, 0.2) 100%);
+        backdrop-filter: blur(15px);
+        border-radius: 25px;
+        padding: 50px 30px;
+        margin-bottom: 50px;
+        text-align: center;
+        border: 2px solid rgba(241, 196, 15, 0.3);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .main-header h1 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, #f1c40f, #f39c12, #e67e22);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+        text-shadow: 0 0 30px rgba(241, 196, 15, 0.3);
+    }
+
+    .main-header .subtitle {
+        color: #ecf0f1;
+        font-size: 1.3rem;
+        font-weight: 300;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .tire-icon {
+        font-size: 5rem;
+        display: inline-block;
+        margin-bottom: 20px;
+        animation: rotate 20s linear infinite;
+    }
+
+    /* Cards estilo moderno */
+    .info-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(236, 240, 241, 0.98) 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.4s ease;
+        animation: fadeInUp 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .info-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, #f1c40f, #e67e22, #3498db);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+
+    .info-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .info-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 25px 50px rgba(241, 196, 15, 0.3);
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #3498db;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .section-icon {
+        font-size: 2.5rem;
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Tipos de gomas - Grid de cards */
+    .tire-types-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin: 30px 0;
+    }
+
+    .tire-type-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .tire-type-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.5);
+    }
+
+    .tire-type-card.direccional {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .tire-type-card.traccion {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .tire-type-card.remolque {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .tire-type-card.todoterreno {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .tire-type-card.larga-distancia {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .tire-type-card h5 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 15px 0 10px;
+    }
+
+    .tire-type-card .icon {
+        font-size: 3rem;
+        margin-bottom: 10px;
+    }
+
+    /* Lista con estilo moderno */
+    .custom-list {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+
+    .custom-list li {
+        padding: 15px 20px;
+        margin: 10px 0;
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(41, 128, 185, 0.05) 100%);
+        border-left: 4px solid #3498db;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        animation: slideInLeft 0.6s ease-out;
+    }
+
+    .custom-list li:hover {
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.2) 0%, rgba(41, 128, 185, 0.1) 100%);
+        transform: translateX(10px);
+        border-left-color: #f39c12;
+    }
+
+    .custom-list li strong {
+        color: #2c3e50;
+        font-weight: 700;
+    }
+
+    /* Especificaciones técnicas - Tabla */
+    .specs-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        margin: 30px 0;
+    }
+
+    .specs-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .specs-table th {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: white;
+        padding: 20px;
+        text-align: left;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .specs-table td {
+        padding: 18px 20px;
+        border-bottom: 1px solid #ecf0f1;
+        color: #2c3e50;
+    }
+
+    .specs-table tr:hover {
+        background: rgba(52, 152, 219, 0.05);
+    }
+
+    .specs-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Alertas personalizadas */
+    .custom-alert {
+        padding: 25px;
+        border-radius: 15px;
+        margin: 30px 0;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        animation: fadeInUp 0.8s ease-out;
+        border: 2px solid;
+    }
+
+    .custom-alert.info {
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.25) 0%, rgba(41, 128, 185, 0.2) 100%);
+        border-color: #3498db;
+        box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    .custom-alert .alert-icon {
+        font-size: 3rem;
+        flex-shrink: 0;
+        color: #3498db;
+    }
+
+    .custom-alert .alert-content h5 {
+        margin: 0 0 10px 0;
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 1.4rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .custom-alert .alert-content p {
+        margin: 0;
+        color: #ffffff;
+        line-height: 1.8;
+        font-size: 1.05rem;
+        font-weight: 500;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Sección de mantenimiento con iconos */
+    .maintenance-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+    }
+
+    .maintenance-item {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .maintenance-item:hover {
+        transform: translateY(-8px);
+        border-color: #27ae60;
+        box-shadow: 0 15px 30px rgba(39, 174, 96, 0.3);
+    }
+
+    .maintenance-item .icon {
+        font-size: 3rem;
+        color: #27ae60;
+        margin-bottom: 15px;
+    }
+
+    .maintenance-item h6 {
+        color: #2c3e50;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .maintenance-item p {
+        color: #555;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    /* Señales de reemplazo */
+    .warning-signs {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 30px 0;
+    }
+
+    .warning-sign {
+        background: linear-gradient(135deg, rgba(231, 76, 60, 0.9) 0%, rgba(192, 57, 43, 0.9) 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .warning-sign:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(231, 76, 60, 0.5);
+    }
+
+    .warning-sign .icon {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    /* Estadísticas */
+    .stats-section {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(39, 174, 96, 0.05) 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin: 40px 0;
+        border: 2px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    .stat-box {
+        text-align: center;
+        padding: 25px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-box:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(46, 204, 113, 0.3);
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* ==================== MARCAS DE GOMAS ==================== */
+    .brands-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+        margin: 30px 0;
+    }
+
+    .brand-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: white;
+        position: relative;
+    }
+
+    .brand-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #f1c40f, #e67e22, #3498db);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+        z-index: 1;
+    }
+
+    .brand-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .brand-card:hover {
+        transform: translateY(-12px) scale(1.02);
+        box-shadow: 0 20px 45px rgba(241, 196, 15, 0.35);
+    }
+
+    .brand-img-wrap {
+        width: 100%;
+        height: 190px;
+        overflow: hidden;
+        background: #111;
+        position: relative;
+        cursor: zoom-in;
+    }
+
+    .brand-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+        display: block;
+    }
+
+    .brand-card:hover .brand-img-wrap img {
+        transform: scale(1.1);
+    }
+
+    /* Ícono de lupa que aparece al hacer hover */
+    .brand-img-wrap::after {
+        content: '🔍';
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        font-size: 1.3rem;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+
+    .brand-img-wrap:hover::after {
+        opacity: 1;
+    }
+
+    .brand-info {
+        padding: 20px 22px 22px;
+    }
+
+    .brand-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #455f7a 0%, #3498db 100%);
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        padding: 4px 14px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+    }
+
+    .brand-name {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #2c3e50;
+        margin: 0 0 5px;
+    }
+
+    .brand-model {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin: 0 0 14px;
+        font-style: italic;
+    }
+
+    .brand-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-bottom: 14px;
+    }
+
+    .brand-tag {
+        background: #f0f3f4;
+        color: #555;
+        font-size: 0.75rem;
+        padding: 4px 11px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+
+    .brand-tag.highlight {
+        background: linear-gradient(135deg, rgba(241,196,15,0.15), rgba(230,126,34,0.15));
+        color: #c0392b;
+        font-weight: 700;
+        border: 1px solid rgba(241,196,15,0.6);
+    }
+
+    .brand-rating {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.82rem;
+        color: #7f8c8d;
+        border-top: 1px solid #ecf0f1;
+        padding-top: 12px;
+    }
+
+    .brand-stars {
+        color: #f1c40f;
+        font-size: 0.95rem;
+        letter-spacing: 1px;
+    }
+
+    .brand-uso {
+        font-size: 0.8rem;
+        color: #95a5a6;
+        margin-top: 5px;
+    }
+
+    /* ==================== LIGHTBOX ==================== */
+    .lightbox-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.93);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        cursor: zoom-out;
+    }
+
+    .lightbox-overlay.active {
+        display: flex;
+        animation: lbFadeIn 0.25s ease;
+    }
+
+    @keyframes lbFadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    .lightbox-inner {
+        position: relative;
+        max-width: 90vw;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: default;
+        animation: lbZoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes lbZoomIn {
+        from { transform: scale(0.75); opacity: 0; }
+        to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .lightbox-inner img {
+        max-width: 88vw;
+        max-height: 78vh;
+        border-radius: 12px;
+        object-fit: contain;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+        display: block;
+    }
+
+    .lightbox-caption {
+        margin-top: 18px;
+        color: #ecf0f1;
+        font-size: 1.25rem;
+        font-weight: 700;
+        text-align: center;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    .lightbox-caption span {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: #bdc3c7;
+        margin-top: 5px;
+        font-style: italic;
+    }
+
+    .lightbox-close {
+        position: fixed;
+        top: 18px;
+        right: 25px;
+        color: #fff;
+        font-size: 2.5rem;
+        font-weight: 300;
+        cursor: pointer;
+        line-height: 1;
+        transition: all 0.25s ease;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255,255,255,0.25);
+        z-index: 10000;
+    }
+
+    .lightbox-close:hover {
+        background: rgba(231, 76, 60, 0.85);
+        transform: rotate(90deg) scale(1.1);
+    }
+
+    /* Responsive */
+    @media (max-width: 991px) {
+        .brands-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+        .main-header h1 { font-size: 2.5rem; }
+        .main-header .subtitle { font-size: 1.1rem; }
+        .section-title { font-size: 1.5rem; }
+        .tire-types-grid,
+        .maintenance-grid,
+        .warning-signs,
+        .stats-grid { grid-template-columns: 1fr; }
+        .brands-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+        .brand-img-wrap { height: 140px; }
+    }
+
+    @media (max-width: 480px) {
+        .brands-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Animación de delay progresivo */
+    .info-card:nth-child(1) { animation-delay: 0.1s; }
+    .info-card:nth-child(2) { animation-delay: 0.2s; }
+    .info-card:nth-child(3) { animation-delay: 0.3s; }
+    .info-card:nth-child(4) { animation-delay: 0.4s; }
+    .info-card:nth-child(5) { animation-delay: 0.5s; }
+</style>
+
+<div class="container my-5">
+    <!-- Header Principal -->
+    <div class="main-header">
+        <div class="tire-icon">🛞</div>
+        <h1>Sistema de Neumáticos para Camiones Pesados</h1>
+        <p class="subtitle">
+            Los neumáticos son el único punto de contacto entre tu camión y la carretera. 
+            Conoce todo sobre estos componentes vitales que determinan la seguridad, eficiencia y rentabilidad de tu operación.
+        </p>
+    </div>
+
+    <!-- Tipos de Neumáticos -->
+    <div class="info-card">
+        <h3 class="section-title">
+            <span class="section-icon">🔍</span>
+            Tipos de Neumáticos para Camiones
+        </h3>
+        
+        <div class="tire-types-grid">
+            <div class="tire-type-card direccional">
+                <div class="icon">🎯</div>
+                <h5>Direccionales</h5>
+                <p>Diseñados para el eje delantero. Proporcionan excelente manejo, dirección precisa y estabilidad a altas velocidades.</p>
+            </div>
+
+            <div class="tire-type-card traccion">
+                <div class="icon">⚡</div>
+                <h5>Tracción</h5>
+                <p>Para ejes motrices. Ofrecen máximo agarre en superficies diversas, ideal para arranques con carga y pendientes.</p>
+            </div>
+
+            <div class="tire-type-card remolque">
+                <div class="icon">📦</div>
+                <h5>Remolque</h5>
+                <p>Optimizados para ejes traseros y trailers. Diseño para soportar peso y minimizar resistencia al rodamiento.</p>
+            </div>
+
+            <div class="tire-type-card todoterreno">
+                <div class="icon">🏔️</div>
+                <h5>Todo Terreno</h5>
+                <p>Versátiles para condiciones mixtas. Excelente desempeño en carretera, tierra, grava y terreno irregular.</p>
+            </div>
+
+            <div class="tire-type-card larga-distancia">
+                <div class="icon">🛣️</div>
+                <h5>Larga Distancia</h5>
+                <p>Especializados en autopistas. Compuesto de caucho duradero que minimiza el desgaste en recorridos extensos.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Especificaciones Técnicas -->
+    <div class="info-card">
+        <h3 class="section-title">
+            <span class="section-icon">⚙️</span>
+            Especificaciones Técnicas Comunes
+        </h3>
+
+        <div class="specs-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Especificación</th>
+                        <th>Valores Típicos</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Medidas Comunes</strong></td>
+                        <td>11R22.5, 295/75R22.5, 285/75R24.5</td>
+                        <td>Tamaños estándar para camiones pesados</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Presión de Inflado</strong></td>
+                        <td>100-120 PSI (7-8.5 bar)</td>
+                        <td>Varía según carga y posición del eje</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Capacidad de Carga</strong></td>
+                        <td>2,500 - 3,750 kg por neumático</td>
+                        <td>Depende del índice de carga</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Índice de Velocidad</strong></td>
+                        <td>L (120 km/h) - M (130 km/h)</td>
+                        <td>Velocidad máxima sostenida segura</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Profundidad Inicial</strong></td>
+                        <td>18-20 mm</td>
+                        <td>Dibujo nuevo de fábrica</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Profundidad Mínima Legal</strong></td>
+                        <td>4 mm (1.6 mm en algunos países)</td>
+                        <td>Límite para operar legalmente</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vida Útil Esperada</strong></td>
+                        <td>80,000 - 150,000 km</td>
+                        <td>Varía según uso y mantenimiento</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rango de Temperatura</strong></td>
+                        <td>-40°C a +80°C</td>
+                        <td>Temperatura operativa del compuesto</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Programa de Mantenimiento -->
+    <div class="info-card">
+        <h3 class="section-title">
+            <span class="section-icon">🔧</span>
+            Programa de Mantenimiento Preventivo
+        </h3>
+
+        <div class="maintenance-grid">
+            <div class="maintenance-item">
+                <div class="icon">✅</div>
+                <h6>Inspección Diaria</h6>
+                <p>Verificar presión, daños visibles y objetos incrustados antes de cada viaje</p>
+            </div>
+
+            <div class="maintenance-item">
+                <div class="icon">📅</div>
+                <h6>Cada 2 Semanas</h6>
+                <p>Chequeo completo de presión en todos los neumáticos con manómetro calibrado</p>
+            </div>
+
+            <div class="maintenance-item">
+                <div class="icon">🔄</div>
+                <h6>Cada 10,000-15,000 km</h6>
+                <p>Rotación de neumáticos para asegurar desgaste uniforme y extender vida útil</p>
+            </div>
+
+            <div class="maintenance-item">
+                <div class="icon">⚖️</div>
+                <h6>Cada 20,000 km</h6>
+                <p>Balanceo y alineación profesional para prevenir vibraciones y desgaste irregular</p>
+            </div>
+
+            <div class="maintenance-item">
+                <div class="icon">📏</div>
+                <h6>Mensual</h6>
+                <p>Medir profundidad del dibujo con calibrador en múltiples puntos de cada neumático</p>
+            </div>
+
+            <div class="maintenance-item">
+                <div class="icon">🧹</div>
+                <h6>Semanal</h6>
+                <p>Limpieza de piedras y escombros atrapados entre las ranuras del dibujo</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Señales de Reemplazo -->
+    <div class="info-card">
+        <h3 class="section-title">
+            <span class="section-icon">⚠️</span>
+            Señales Críticas de Reemplazo Inmediato
+        </h3>
+
+        <div class="warning-signs">
+            <div class="warning-sign">
+                <div class="icon">📏</div>
+                <strong>Dibujo < 4mm</strong>
+                <p>Profundidad insuficiente</p>
+            </div>
+
+            <div class="warning-sign">
+                <div class="icon">📐</div>
+                <strong>Desgaste Irregular</strong>
+                <p>Uno o ambos hombros</p>
+            </div>
+
+            <div class="warning-sign">
+                <div class="icon">⚡</div>
+                <strong>Grietas Visibles</strong>
+                <p>En paredes laterales</p>
+            </div>
+
+            <div class="warning-sign">
+                <div class="icon">🎈</div>
+                <strong>Bultos/Deformaciones</strong>
+                <p>Daño estructural interno</p>
+            </div>
+
+            <div class="warning-sign">
+                <div class="icon">〰️</div>
+                <strong>Vibración Anormal</strong>
+                <p>Durante la conducción</p>
+            </div>
+
+            <div class="warning-sign">
+                <div class="icon">💨</div>
+                <strong>Pérdida de Presión</strong>
+                <p>Constante o recurrente</p>
+            </div>
+
+            <div class="warning-sign">
+                <div class="icon">📆</div>
+                <strong>Edad > 7 años</strong>
+                <p>Aunque tenga dibujo</p>
+            </div>
+
+            <div class="warning-sign">
+                <div class="icon">🔥</div>
+                <strong>Sobrecalentamiento</strong>
+                <p>Después de uso normal</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Consejos de Eficiencia -->
+    <div class="info-card">
+        <h3 class="section-title">
+            <span class="section-icon">💰</span>
+            Optimización de Costos y Eficiencia
+        </h3>
+
+        <ul class="custom-list">
+            <li>
+                <strong>Presión Correcta:</strong> Mantener la presión adecuada puede reducir el consumo de combustible hasta un 3% y extender la vida del neumático un 25%. Una diferencia de 10 PSI puede costar cientos de dólares anuales.
+            </li>
+            <li>
+                <strong>Alineación Precisa:</strong> Una alineación incorrecta puede reducir la vida útil del neumático hasta en un 50% y aumentar el consumo de combustible un 5%. Inversión que se recupera rápidamente.
+            </li>
+            <li>
+                <strong>Velocidad Controlada:</strong> Reducir la velocidad de crucero de 105 km/h a 95 km/h puede aumentar la vida del neumático un 15% y mejorar el consumo de combustible significativamente.
+            </li>
+            <li>
+                <strong>Carga Balanceada:</strong> Distribuir la carga uniformemente previene desgaste prematuro y mejora la estabilidad. Un eje sobrecargado puede reducir la vida del neumático a la mitad.
+            </li>
+            <li>
+                <strong>Estilo de Conducción:</strong> Evitar aceleraciones bruscas, frenados violentos y giros cerrados a alta velocidad puede extender la vida útil hasta un 30%.
+            </li>
+            <li>
+                <strong>Recapado Profesional:</strong> Un neumático de calidad puede recaperse 2-3 veces, ahorrando hasta 60% del costo de uno nuevo. Requiere inspección profesional del casco.
+            </li>
+            <li>
+                <strong>Monitoreo Continuo:</strong> Sistemas TPMS (Tire Pressure Monitoring System) pueden alertar sobre problemas antes de que se vuelvan costosos, reduciendo hasta 75% las averías por neumáticos.
+            </li>
+            <li>
+                <strong>Temporada Adecuada:</strong> Usar neumáticos apropiados para las condiciones climáticas (invierno, verano) mejora seguridad y reduce desgaste prematuro.
+            </li>
+        </ul>
+    </div>
+
+    <!-- Estadísticas de Impacto -->
+    <div class="stats-section">
+        <h3 class="section-title">
+            <span class="section-icon">📊</span>
+            Impacto de los Neumáticos en tu Operación
+        </h3>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-number">30-40%</span>
+                <span class="stat-label">Del costo operativo de combustible</span>
+            </div>
+
+            <div class="stat-box">
+                <span class="stat-number">15-20%</span>
+                <span class="stat-label">De los costos de mantenimiento</span>
+            </div>
+
+            <div class="stat-box">
+                <span class="stat-number">75%</span>
+                <span class="stat-label">De averías en carretera son por neumáticos</span>
+            </div>
+
+            <div class="stat-box">
+                <span class="stat-number">100K km</span>
+                <span class="stat-label">Vida útil promedio con buen mantenimiento</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerta final informativa -->
+    <div class="custom-alert info">
+        <div class="alert-icon">💡</div>
+        <div class="alert-content">
+            <h5>Dato Importante</h5>
+            <p>
+                Los neumáticos bien mantenidos no solo mejoran la seguridad y reducen costos operativos, 
+                sino que también disminuyen las emisiones de CO2 hasta en un 4% y reducen el ruido de rodadura. 
+                Un programa de mantenimiento adecuado puede generar ahorros de hasta $10,000 USD anuales por camión.
+            </p>
+        </div>
+    </div>
+
+    <!-- ==================== MARCAS MÁS USADAS EN EE.UU. ==================== -->
+    <div class="info-card">
+        <h3 class="section-title">
+            <span class="section-icon">🏆</span>
+            Marcas Más Usadas en EE.UU.
+        </h3>
+
+        <div class="brands-grid">
+
+            <!-- Michelin -->
+            <div class="brand-card">
+                <div class="brand-img-wrap" onclick="openLightbox(this)">
+                    <img src="{{ url_for('static', filename='img/gomas/michelin.jpg') }}"
+                         alt="Michelin neumático camión pesado"
+                         data-nombre="Michelin"
+                         data-modelo="X Line Energy Z · XDA2+ Energy"
+                         loading="lazy">
+                </div>
+                <div class="brand-info">
+                    <span class="brand-badge">🏆 Top Pick</span>
+                    <h3 class="brand-name">Michelin</h3>
+                    <p class="brand-model">X Line Energy Z · XDA2+ Energy</p>
+                    <div class="brand-tags">
+                        <span class="brand-tag highlight">★ Más vendida EE.UU.</span>
+                        <span class="brand-tag">Larga distancia</span>
+                        <span class="brand-tag">Bajo consumo</span>
+                    </div>
+                    <div class="brand-rating">
+                        <span class="brand-stars">★★★★★</span>
+                        <span>4.9 / 5</span>
+                    </div>
+                    <p class="brand-uso">Ideal para: autopistas interestatales · 18 wheelers</p>
+                </div>
+            </div>
+
+            <!-- Bridgestone -->
+            <div class="brand-card">
+                <div class="brand-img-wrap" onclick="openLightbox(this)">
+                    <img src="{{ url_for('static', filename='img/gomas/bridgestone.jpg') }}"
+                         alt="Bridgestone neumático camión"
+                         data-nombre="Bridgestone"
+                         data-modelo="R283A Ecopia · M860A"
+                         loading="lazy">
+                </div>
+                <div class="brand-info">
+                    <span class="brand-badge">⭐ Premium</span>
+                    <h3 class="brand-name">Bridgestone</h3>
+                    <p class="brand-model">R283A Ecopia · M860A</p>
+                    <div class="brand-tags">
+                        <span class="brand-tag highlight">Tracción superior</span>
+                        <span class="brand-tag">Todo clima</span>
+                        <span class="brand-tag">18-Wheeler</span>
+                    </div>
+                    <div class="brand-rating">
+                        <span class="brand-stars">★★★★★</span>
+                        <span>4.8 / 5</span>
+                    </div>
+                    <p class="brand-uso">Ideal para: rutas regionales · todo tipo de carga</p>
+                </div>
+            </div>
+
+            <!-- Goodyear -->
+            <div class="brand-card">
+                <div class="brand-img-wrap" onclick="openLightbox(this)">
+                    <img src="{{ url_for('static', filename='img/gomas/goodyear.jpg') }}"
+                         alt="Goodyear neumático camión americano"
+                         data-nombre="Goodyear"
+                         data-modelo="Fuel Max RSA · G395 LHT"
+                         loading="lazy">
+                </div>
+                <div class="brand-info">
+                    <span class="brand-badge">🇺🇸 Americana</span>
+                    <h3 class="brand-name">Goodyear</h3>
+                    <p class="brand-model">Fuel Max RSA · G395 LHT</p>
+                    <div class="brand-tags">
+                        <span class="brand-tag highlight">Icónica de EE.UU.</span>
+                        <span class="brand-tag">Regional</span>
+                        <span class="brand-tag">Carga pesada</span>
+                    </div>
+                    <div class="brand-rating">
+                        <span class="brand-stars">★★★★★</span>
+                        <span>4.7 / 5</span>
+                    </div>
+                    <p class="brand-uso">Ideal para: camiones regionales · distribución</p>
+                </div>
+            </div>
+
+            <!-- Continental -->
+            <div class="brand-card">
+                <div class="brand-img-wrap" onclick="openLightbox(this)">
+                    <img src="{{ url_for('static', filename='img/gomas/continental.jpg') }}"
+                         alt="Continental neumático camión"
+                         data-nombre="Continental"
+                         data-modelo="HSR2 · HDR2+ EcoPlus"
+                         loading="lazy">
+                </div>
+                <div class="brand-info">
+                    <span class="brand-badge">🇩🇪 Alemana</span>
+                    <h3 class="brand-name">Continental</h3>
+                    <p class="brand-model">HSR2 · HDR2+ EcoPlus</p>
+                    <div class="brand-tags">
+                        <span class="brand-tag highlight">Tecnología europea</span>
+                        <span class="brand-tag">Autopista</span>
+                        <span class="brand-tag">Bajo rodaje</span>
+                    </div>
+                    <div class="brand-rating">
+                        <span class="brand-stars">★★★★★</span>
+                        <span>4.7 / 5</span>
+                    </div>
+                    <p class="brand-uso">Ideal para: viajes de larga distancia · fuel economy</p>
+                </div>
+            </div>
+
+            <!-- Yokohama -->
+            <div class="brand-card">
+                <div class="brand-img-wrap" onclick="openLightbox(this)">
+                    <img src="{{ url_for('static', filename='img/gomas/yokohama.jpg') }}"
+                         alt="Yokohama neumático camión pesado"
+                         data-nombre="Yokohama"
+                         data-modelo="101ZR · 108ZR"
+                         loading="lazy">
+                </div>
+                <div class="brand-info">
+                    <span class="brand-badge">🇯🇵 Japonesa</span>
+                    <h3 class="brand-name">Yokohama</h3>
+                    <p class="brand-model">101ZR · 108ZR</p>
+                    <div class="brand-tags">
+                        <span class="brand-tag highlight">Mejor precio-calidad</span>
+                        <span class="brand-tag">Mixto</span>
+                        <span class="brand-tag">Larga vida útil</span>
+                    </div>
+                    <div class="brand-rating">
+                        <span class="brand-stars">★★★★☆</span>
+                        <span>4.5 / 5</span>
+                    </div>
+                    <p class="brand-uso">Ideal para: servicio mixto · rutas urbanas y rurales</p>
+                </div>
+            </div>
+
+            <!-- Toyo -->
+            <div class="brand-card">
+                <div class="brand-img-wrap" onclick="openLightbox(this)">
+                    <img src="{{ url_for('static', filename='img/gomas/toyo.jpg') }}"
+                         alt="Toyo neumático camión off-road"
+                         data-nombre="Toyo"
+                         data-modelo="M154 · M643"
+                         loading="lazy">
+                </div>
+                <div class="brand-info">
+                    <span class="brand-badge">🏔️ Versátil</span>
+                    <h3 class="brand-name">Toyo</h3>
+                    <p class="brand-model">M154 · M643</p>
+                    <div class="brand-tags">
+                        <span class="brand-tag highlight">Off-road</span>
+                        <span class="brand-tag">All-Season</span>
+                        <span class="brand-tag">Regional</span>
+                    </div>
+                    <div class="brand-rating">
+                        <span class="brand-stars">★★★★☆</span>
+                        <span>4.4 / 5</span>
+                    </div>
+                    <p class="brand-uso">Ideal para: terrenos difíciles · construcción · minería</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== LIGHTBOX ==================== -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox(event)">
+    <div class="lightbox-close" onclick="closeLightboxDirect()">×</div>
+    <div class="lightbox-inner" onclick="event.stopPropagation()">
+        <img id="lightboxImg" src="" alt="">
+        <div class="lightbox-caption">
+            <strong id="lightboxNombre"></strong>
+            <span id="lightboxModelo"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openLightbox(wrap) {
+        const img = wrap.querySelector('img');
+        document.getElementById('lightboxImg').src = img.src;
+        document.getElementById('lightboxImg').alt = img.alt;
+        document.getElementById('lightboxNombre').textContent = img.dataset.nombre || '';
+        document.getElementById('lightboxModelo').textContent = img.dataset.modelo || '';
+        document.getElementById('lightboxOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(e) {
+        if (e.target === document.getElementById('lightboxOverlay')) {
+            closeLightboxDirect();
+        }
+    }
+
+    function closeLightboxDirect() {
+        document.getElementById('lightboxOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Cerrar con tecla Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeLightboxDirect();
+    });
+</script>
+
+{% endblock %}

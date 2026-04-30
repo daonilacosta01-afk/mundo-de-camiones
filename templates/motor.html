@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motores de Camiones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* =====================================================
+           FONDO INDUSTRIAL DIÉSEL
+        ===================================================== */
+        body {
+            background-color: #090909;
+            min-height: 100vh;
+            padding: 2rem 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Textura metal cepillado */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px, transparent 3px,
+                    rgba(255,255,255,0.013) 3px, rgba(255,255,255,0.013) 4px
+                ),
+                repeating-linear-gradient(
+                    180deg,
+                    transparent 0px, transparent 8px,
+                    rgba(255,255,255,0.006) 8px, rgba(255,255,255,0.006) 9px
+                );
+        }
+
+        /* Grid fibra de carbono */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.027) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.027) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+
+        /* Orbes de luz ámbar */
+        #bg-glow-1, #bg-glow-2, #bg-glow-3 {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        #bg-glow-1 {
+            width: 520px; height: 520px;
+            background: radial-gradient(circle, rgba(200,138,24,0.11) 0%, transparent 70%);
+            top: -130px; left: -100px;
+            animation: bgDrift1 20s ease-in-out infinite;
+        }
+        #bg-glow-2 {
+            width: 440px; height: 440px;
+            background: radial-gradient(circle, rgba(175,108,10,0.08) 0%, transparent 70%);
+            bottom: -80px; right: -60px;
+            animation: bgDrift2 26s ease-in-out infinite;
+        }
+        #bg-glow-3 {
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(210,148,18,0.05) 0%, transparent 70%);
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: bgDrift3 32s ease-in-out infinite;
+        }
+        @keyframes bgDrift1 {
+            0%,100% { transform: translate(0,0); }
+            40%     { transform: translate(65px,45px); }
+            70%     { transform: translate(22px,-32px); }
+        }
+        @keyframes bgDrift2 {
+            0%,100% { transform: translate(0,0); }
+            35%     { transform: translate(-52px,-32px); }
+            70%     { transform: translate(-18px,22px); }
+        }
+        @keyframes bgDrift3 {
+            0%,100% { transform: translate(-50%,-50%) scale(1); }
+            50%     { transform: translate(-50%,-50%) scale(1.35); }
+        }
+
+        /* Línea de escaneo ámbar */
+        #bg-scanline {
+            position: fixed;
+            left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(220,148,28,0.18) 30%,
+                rgba(242,168,38,0.40) 50%,
+                rgba(220,148,28,0.18) 70%,
+                transparent 100%
+            );
+            top: 0;
+            z-index: 2;
+            animation: bgScan 15s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes bgScan {
+            0%   { top: -1px; opacity: 0; }
+            5%   { opacity: 1; }
+            95%  { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Líneas ámbar fijas */
+        .bg-accent-line {
+            position: fixed;
+            left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(210,143,18,0.20), transparent);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .bg-accent-line.top    { top: 28%; }
+        .bg-accent-line.bottom { top: 72%; }
+
+        /* Canvas de partículas */
+        #bg-particles {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.72;
+        }
+
+        /* Watermark motor (esquina inferior derecha) */
+        #bg-watermark {
+            position: fixed;
+            bottom: -10px;
+            right: -20px;
+            width: 340px;
+            opacity: 0.03;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Todo el contenido de la página por encima del fondo */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+        }
+
+        /* =====================================================
+           ESTILOS ORIGINALES
+        ===================================================== */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.95);
+            color: #667eea;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        .back-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.5);
+        }
+        .back-button::before {
+            content: "←";
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .hero-section {
+            background: rgba(255,255,255,0.96);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .hero-section p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .brand-section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 100px;
+        }
+
+        .brand-header {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(235,235,235,0.95) 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+            border-left: 6px solid #c8880f;
+        }
+        .brand-header h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #222;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .brand-logo { font-size: 3rem; }
+
+        .motor-card {
+            background: rgba(255,255,255,0.97);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .motor-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+        }
+
+        .img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: zoom-in;
+        }
+        .img-wrapper::after {
+            content: '🔍';
+            position: absolute;
+            bottom: 12px; right: 12px;
+            font-size: 1.3rem;
+            background: rgba(0,0,0,0.55);
+            border-radius: 50%;
+            width: 38px; height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .img-wrapper:hover::after { opacity: 1; }
+
+        .motor-card img.img-click {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+            box-shadow: none;
+            border-radius: 0;
+            margin-bottom: 0;
+        }
+        .img-wrapper:hover .img-click { transform: scale(1.06); }
+
+        .motor-card h5 {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .motor-card h5::before {
+            content: "🔧";
+            font-size: 1.5rem;
+        }
+        .motor-card p {
+            color: #444;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .specs-table {
+            background: #f4f4f4;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .specs-table table { margin-bottom: 0; }
+        .specs-table td { padding: 0.5rem; border: none; }
+        .specs-table tr { border-bottom: 1px solid #ddd; }
+        .specs-table tr:last-child { border-bottom: none; }
+
+        .ventajas {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 5px solid #28a745;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .ventajas strong { color: #155724; font-size: 1.1rem; display: block; margin-bottom: 0.5rem; }
+        .ventajas ul { margin-bottom: 0; padding-left: 1.2rem; }
+        .ventajas li { color: #155724; margin-bottom: 0.3rem; }
+
+        .desventajas {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-left: 5px solid #dc3545;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .desventajas strong { color: #721c24; font-size: 1.1rem; display: block; margin-bottom: 0.5rem; }
+        .desventajas ul { margin-bottom: 0; padding-left: 1.2rem; }
+        .desventajas li { color: #721c24; margin-bottom: 0.3rem; }
+
+        .badge-popular {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section h1 { font-size: 1.8rem; }
+            .img-wrapper { height: 220px; }
+            .brand-header h2 { font-size: 1.8rem; }
+            #bg-watermark { width: 200px; }
+        }
+
+        /* =====================================================
+           CLON VOLADOR
+        ===================================================== */
+        .flying-clone {
+            position: fixed;
+            z-index: 9000;
+            border-radius: 12px;
+            object-fit: cover;
+            pointer-events: none;
+            will-change: transform, opacity, border-radius;
+            transition:
+                top    0.52s cubic-bezier(0.4, 0, 0.2, 1),
+                left   0.52s cubic-bezier(0.4, 0, 0.2, 1),
+                width  0.52s cubic-bezier(0.4, 0, 0.2, 1),
+                height 0.52s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.52s ease,
+                border-radius 0.52s ease;
+        }
+
+        /* =====================================================
+           MODAL PERSONALIZADO
+        ===================================================== */
+        #motorModal .modal-dialog {
+            max-width: min(92vw, 1100px);
+            margin: auto;
+        }
+        #motorModal .modal-content {
+            background: #0d0d0d;
+            border: none;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+            animation: modalZoomIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        @keyframes modalZoomIn {
+            from { transform: scale(0.82); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+        #motorModal .modal-header {
+            background: rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 1rem 1.5rem;
+        }
+        #motorModal .modal-title {
+            color: #fff;
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        #motorModal .btn-close {
+            filter: invert(1);
+            opacity: 0.7;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        #motorModal .btn-close:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        .modal-img-area {
+            position: relative;
+            width: 100%;
+            height: clamp(300px, 65vh, 700px);
+            overflow: hidden;
+            background: #111;
+            cursor: grab;
+            user-select: none;
+        }
+        .modal-img-area.dragging { cursor: grabbing; }
+
+        #modalImage {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            transform-origin: center center;
+            max-width: 100%; max-height: 100%;
+            object-fit: contain;
+            display: block;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            border: 1.5px solid rgba(255,255,255,0.22);
+            color: #fff;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s, border-color 0.2s;
+            backdrop-filter: blur(8px);
+            line-height: 1;
+        }
+        .nav-arrow:hover {
+            background: rgba(200,136,15,0.7);
+            border-color: rgba(220,155,20,0.9);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .nav-arrow:active { transform: translateY(-50%) scale(0.95); }
+        .nav-arrow.left  { left: 14px; }
+        .nav-arrow.right { right: 14px; }
+
+        .modal-footer-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255,255,255,0.04);
+            border-top: 1px solid rgba(255,255,255,0.07);
+        }
+        .img-counter { color: rgba(255,255,255,0.5); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em; }
+        .zoom-hint   { color: rgba(255,255,255,0.35); font-size: 0.78rem; }
+        .zoom-reset-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            border-radius: 6px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .zoom-reset-btn:hover { background: rgba(255,255,255,0.2); }
+
+        .zoom-indicator {
+            position: absolute;
+            top: 14px; right: 14px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border-radius: 20px;
+            padding: 0.25rem 0.7rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(6px);
+        }
+        .zoom-indicator.visible { opacity: 1; }
+
+        .thumbnails-row {
+            display: flex;
+            gap: 8px;
+            padding: 10px 16px;
+            overflow-x: auto;
+            background: #0a0a0a;
+            scrollbar-width: thin;
+            scrollbar-color: #444 transparent;
+        }
+        .thumbnails-row::-webkit-scrollbar { height: 4px; }
+        .thumbnails-row::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+
+        .thumb {
+            flex: 0 0 64px; height: 48px;
+            border-radius: 6px; overflow: hidden;
+            cursor: pointer; opacity: 0.45;
+            border: 2px solid transparent;
+            transition: opacity 0.2s, border-color 0.2s, transform 0.2s;
+        }
+        .thumb:hover { opacity: 0.8; transform: translateY(-2px); }
+        .thumb.active { opacity: 1; border-color: #c8880f; transform: translateY(-2px); }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .modal-backdrop { backdrop-filter: blur(4px); }
+    </style>
+</head>
+<body>
+
+    <!-- =====================================================
+         ELEMENTOS DE FONDO (van ANTES del .container)
+    ===================================================== -->
+    <div id="bg-glow-1"></div>
+    <div id="bg-glow-2"></div>
+    <div id="bg-glow-3"></div>
+    <div id="bg-scanline"></div>
+    <div class="bg-accent-line top"></div>
+    <div class="bg-accent-line bottom"></div>
+    <canvas id="bg-particles"></canvas>
+
+    <!-- Watermark: silueta de motor diésel -->
+    <svg id="bg-watermark" viewBox="0 0 300 220" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="60" width="260" height="100" rx="12"/>
+        <rect x="40" y="40" width="28" height="24" rx="4"/>
+        <rect x="100" y="40" width="28" height="24" rx="4"/>
+        <rect x="160" y="40" width="28" height="24" rx="4"/>
+        <rect x="220" y="40" width="28" height="24" rx="4"/>
+        <rect x="8" y="78" width="16" height="64" rx="4"/>
+        <rect x="276" y="78" width="16" height="64" rx="4"/>
+        <rect x="48" y="160" width="204" height="18" rx="5"/>
+        <rect x="68" y="178" width="18" height="32" rx="3"/>
+        <rect x="128" y="178" width="18" height="32" rx="3"/>
+        <rect x="188" y="178" width="18" height="32" rx="3"/>
+        <circle cx="60" cy="110" r="22"/>
+        <circle cx="60" cy="110" r="11" fill="#090909"/>
+        <circle cx="240" cy="110" r="22"/>
+        <circle cx="240" cy="110" r="11" fill="#090909"/>
+        <rect x="82" y="84" width="136" height="52" rx="6"/>
+        <circle cx="150" cy="110" r="14" fill="#090909"/>
+        <rect x="118" y="74" width="64" height="10" rx="3"/>
+    </svg>
+
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL
+    ===================================================== -->
+    <div class="container py-4">
+        <a href="{{ url_for('index') }}" class="back-button">Volver al Inicio</a>
+
+        <div class="hero-section">
+            <h1>🚛 Motores de Camiones</h1>
+            <p>Los motores diésel más confiables y potentes del transporte pesado mundial</p>
+        </div>
+
+        <!-- ==================== DETROIT DIESEL ==================== -->
+        <section id="detroit-diesel" class="brand-section">
+            <div class="brand-header">
+                <h2><span class="brand-logo">🔴</span> Detroit Diesel</h2>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Detroit Diesel Series 60 12.7.jpg') }}" alt="Detroit Diesel Series 60 12.7L" class="img-click">
+                        </div>
+                        <h5>Detroit Diesel Series 60 12.7L</h5>
+                        <p>El Detroit Diesel Series 60 12.7 es un motor diésel de 6 cilindros en línea, diseñado para combinar potencia, eficiencia y confiabilidad. Con su tecnología avanzada de inyección electrónica y capacidad de 12.7 litros, este motor ofrece un rendimiento sólido para camiones de carga pesada y transporte de larga distancia.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Detroit Diesel Series 60 12.7L</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>350 – 500 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1150 – 1650 lb-ft (1830 – 2237 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>12.7 Litros</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección electrónica DDEC</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Alta confiabilidad en largas distancias</li>
+                                <li>Consumo de combustible eficiente</li>
+                                <li>Bajo costo de mantenimiento</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Menor potencia frente a motores modernos</li>
+                                <li>Tecnología antigua</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Detroit Diesel DD15.jpg') }}" alt="Detroit Diesel DD15" class="img-click">
+                        </div>
+                        <h5>Detroit Diesel DD15</h5>
+                        <p>El Detroit DD15 es un motor de nueva generación que redefine el transporte pesado con su equilibrio entre potencia, eficiencia y tecnología avanzada. Con 14.8 litros de cilindrada, destaca por su sistema de inyección Amplified Common Rail System (ACRS).</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Detroit Diesel DD15</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>400 – 505 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1450 – 1850 lb-ft (1966 – 2508 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>14.8 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail (ACRS)</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Alta eficiencia de combustible</li>
+                                <li>Intervalos de mantenimiento prolongados</li>
+                                <li>Funcionamiento silencioso</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Costos de reparación elevados</li>
+                                <li>Dependencia del sistema electrónico</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Detroit Diesel DD13.jpg') }}" alt="Detroit Diesel DD13" class="img-click">
+                        </div>
+                        <h5>Detroit Diesel DD13</h5>
+                        <p>El DD13 es un motor de 12.8 litros diseñado para aplicaciones de servicio mediano a pesado. Ofrece un excelente equilibrio entre potencia y eficiencia de combustible, siendo ideal para flotas que buscan reducir costos operativos sin sacrificar rendimiento.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Detroit Diesel DD13</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>350 – 470 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1250 – 1650 lb-ft (1695 – 2237 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>12.8 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Excelente economía de combustible</li>
+                                <li>Peso ligero para su clase</li>
+                                <li>Mantenimiento simplificado</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Menor torque que el DD15</li>
+                                <li>No recomendado para cargas muy pesadas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Detroit Diesel Series 60 14L.jpg') }}" alt="Detroit Diesel Series 60 14L" class="img-click">
+                        </div>
+                        <h5>Detroit Diesel Series 60 14L</h5>
+                        <p>Versión de mayor cilindrada del legendario Series 60, el 14L ofrece más torque y potencia para aplicaciones extremadamente pesadas. Es la elección preferida para operaciones de acarreo pesado, minería y construcción donde se requiere máxima capacidad de tiro.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Detroit Diesel Series 60 14L</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>430 – 575 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1550 – 1850 lb-ft (2101 – 2508 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>14.0 Litros</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección electrónica DDEC</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Mayor torque para cargas pesadas</li>
+                                <li>Probado en condiciones extremas</li>
+                                <li>Repuestos ampliamente disponibles</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Mayor consumo de combustible</li>
+                                <li>Peso más elevado</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CUMMINS ==================== -->
+        <section id="cummins" class="brand-section">
+            <div class="brand-header">
+                <h2><span class="brand-logo">⚫</span> Cummins</h2>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Cummins Big Cam.jpg') }}" alt="Cummins Big Cam" class="img-click">
+                        </div>
+                        <h5>Cummins Big Cam</h5>
+                        <p>El Cummins Big Cam es un motor diésel de alto rendimiento, diseñado para ofrecer potencia confiable y eficiencia en cada viaje. Con su innovador sistema Big Cam, garantiza un funcionamiento suave, mayor durabilidad y un consumo optimizado de combustible.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Cummins Big Cam</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>350 – 450 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1150 – 1650 lb-ft (1558 – 2237 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>11.9 – 14 Litros</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Mecánico con mejoras de emisiones</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Extremadamente duradero</li>
+                                <li>Mantenimiento sencillo</li>
+                                <li>Repuestos económicos y disponibles</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>No tan eficiente como motores modernos</li>
+                                <li>Emisiones altas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Cummins X15.jpg') }}" alt="Cummins X15" class="img-click">
+                        </div>
+                        <h5>Cummins X15 <span class="badge-popular">🔥 Potencia</span></h5>
+                        <p>El Cummins X15 es un motor diésel de última generación, diseñado para ofrecer potencia máxima y eficiencia superior. Con 15 litros de cilindrada y tecnología avanzada de inyección electrónica, garantiza un rendimiento sólido y durabilidad excepcional.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Cummins X15</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>400 – 605 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1450 – 2050 lb-ft (1966 – 2779 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>15 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección electrónica XPI</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Eficiencia de combustible optimizada</li>
+                                <li>Alta potencia con emisiones reducidas</li>
+                                <li>Tecnología moderna de diagnóstico</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Requiere mantenimiento especializado</li>
+                                <li>Costo inicial elevado</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Cummins N14.jpg') }}" alt="Cummins N14" class="img-click">
+                        </div>
+                        <h5>Cummins N14 <span class="badge-popular">⭐ Clásico</span></h5>
+                        <p>El Cummins N14 es un clásico legendario de la industria del transporte pesado. Este motor de 6 cilindros y 14 litros combina fuerza bruta con una reputación de durabilidad y facilidad de mantenimiento que pocos pueden igualar.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Cummins N14</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>310 – 525 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1250 – 1850 lb-ft (1695 – 2508 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>14 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Mecánico / Electrónico (Celect)</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Motor muy confiable y probado</li>
+                                <li>Fácil de reparar y mantener</li>
+                                <li>Repuestos abundantes y económicos</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>No tan eficiente como motores modernos</li>
+                                <li>Peso elevado</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Cummins ISX.jpg') }}" alt="Cummins ISX" class="img-click">
+                        </div>
+                        <h5>Cummins ISX</h5>
+                        <p>El ISX es el predecesor del X15 y uno de los motores más populares en la historia de Cummins. Con tecnología de inyección de combustible de alta presión y gestión electrónica avanzada, ofrece un rendimiento excepcional para aplicaciones de larga distancia.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Cummins ISX</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>400 – 600 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1450 – 2050 lb-ft (1966 – 2779 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>15 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Rendimiento probado por millones de km</li>
+                                <li>Excelente relación potencia/peso</li>
+                                <li>Red de servicio amplia</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Sistema EGR puede presentar problemas</li>
+                                <li>Mantenimiento del aftertreatment costoso</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Cummins ISM.jpg') }}" alt="Cummins ISM" class="img-click">
+                        </div>
+                        <h5>Cummins ISM</h5>
+                        <p>El ISM de 11 litros es un motor versátil diseñado para aplicaciones de servicio mediano a pesado. Popular en autobuses, camiones de reparto y vehículos recreativos, ofrece un equilibrio ideal entre potencia, economía y durabilidad.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Cummins ISM</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>280 – 450 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1050 – 1550 lb-ft (1424 – 2101 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>10.8 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección electrónica</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Compacto y ligero</li>
+                                <li>Excelente para aplicaciones urbanas</li>
+                                <li>Bajo consumo de combustible</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>No adecuado para cargas muy pesadas</li>
+                                <li>Menor torque que motores de 15L</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Cummins L9.jpg') }}" alt="Cummins L9" class="img-click">
+                        </div>
+                        <h5>Cummins L9</h5>
+                        <p>El L9 es el motor más reciente de Cummins para aplicaciones de servicio mediano. Con 8.9 litros, ofrece tecnología de punta con emisiones ultra bajas, siendo ideal para camiones de reparto urbano y aplicaciones regionales donde la eficiencia es clave.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Cummins L9</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>260 – 380 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>860 – 1250 lb-ft (1166 – 1695 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>8.9 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Motor moderno con última tecnología</li>
+                                <li>Emisiones ultra bajas</li>
+                                <li>Excelente economía de combustible</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Limitado para trabajo pesado</li>
+                                <li>Relativamente nuevo en el mercado</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CATERPILLAR ==================== -->
+        <section id="caterpillar" class="brand-section">
+            <div class="brand-header">
+                <h2><span class="brand-logo">🟡</span> Caterpillar</h2>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Caterpillar C15.jpg') }}" alt="Caterpillar C15" class="img-click">
+                        </div>
+                        <h5>Caterpillar C15 <span class="badge-popular">👑 Rey Americano</span></h5>
+                        <p>El Caterpillar C15 es un motor diésel de 6 cilindros en línea que combina potencia brutal con confiabilidad legendaria. Con 15.2 litros de capacidad, está diseñado para enfrentar los trabajos más exigentes, considerado por muchos como el rey de los motores diésel americanos.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Caterpillar C15</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>435 – 625 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1550 – 2050 lb-ft (2101 – 2779 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>15.2 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección electrónica HEUI</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Excelente potencia para cargas extremas</li>
+                                <li>Durabilidad en condiciones severas</li>
+                                <li>Amplia disponibilidad de repuestos</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Mayor consumo de combustible</li>
+                                <li>Mantenimiento más costoso</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Caterpillar C13.jpg') }}" alt="Caterpillar C13" class="img-click">
+                        </div>
+                        <h5>Caterpillar C13</h5>
+                        <p>El C13 es un motor de servicio pesado de 12.5 litros que ofrece un excelente equilibrio entre potencia y eficiencia. Popular en aplicaciones de construcción, minería y transporte regional, es conocido por su robustez y confiabilidad en condiciones extremas.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Caterpillar C13</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>380 – 475 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1350 – 1750 lb-ft (1830 – 2372 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>12.5 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección electrónica ACERT</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Construcción robusta para trabajo pesado</li>
+                                <li>Buena respuesta en bajas RPM</li>
+                                <li>Versatilidad de aplicaciones</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Consumo de combustible medio-alto</li>
+                                <li>Repuestos Caterpillar pueden ser costosos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Caterpillar 3406E.jpg') }}" alt="Caterpillar 3406E" class="img-click">
+                        </div>
+                        <h5>Caterpillar 3406E <span class="badge-popular">🏆 Legendario</span></h5>
+                        <p>El 3406E es uno de los motores más icónicos de Caterpillar. Con más de 30 años en el mercado, ha demostrado ser indestructible. Este motor de 14.6 litros es la elección favorita de operadores que valoran la durabilidad extrema sobre cualquier otra característica.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Caterpillar 3406E</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>350 – 550 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1250 – 1850 lb-ft (1695 – 2508 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>14.6 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección electrónica PEEC</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Durabilidad legendaria (millones de km)</li>
+                                <li>Fácil de reparar y mantener</li>
+                                <li>Enorme comunidad de soporte</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Tecnología antigua</li>
+                                <li>Emisiones no cumplen normas actuales</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Caterpillar C12.jpg') }}" alt="Caterpillar C12" class="img-click">
+                        </div>
+                        <h5>Caterpillar C12</h5>
+                        <p>El C12 es un motor de 12 litros diseñado para aplicaciones de servicio mediano a pesado. Utilizado en camiones de volteo, mezcladores de concreto y transporte regional, ofrece potencia suficiente con un tamaño más compacto que sus hermanos mayores.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Caterpillar C12</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>340 – 445 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1250 – 1650 lb-ft (1695 – 2237 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>12.0 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección electrónica HEUI</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Tamaño compacto y peso ligero</li>
+                                <li>Confiable para trabajo constante</li>
+                                <li>Buen torque a bajas revoluciones</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Limitado para cargas muy pesadas</li>
+                                <li>Sistema HEUI puede ser problemático</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MACK ==================== -->
+        <section id="mack" class="brand-section">
+            <div class="brand-header">
+                <h2><span class="brand-logo">🟠</span> Mack</h2>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Mack MP8.jpg') }}" alt="Mack MP8" class="img-click">
+                        </div>
+                        <h5>Mack MP8</h5>
+                        <p>El Mack MP8 es sinónimo de fuerza y durabilidad en el transporte pesado. Con su innovador sistema de inyección, este motor de 13 litros no solo entrega potencia confiable, sino que optimiza el consumo de combustible y reduce emisiones.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Mack MP8</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>415 – 505 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1460 – 1860 lb-ft (1980 – 2522 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>13 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Motor moderno y eficiente</li>
+                                <li>Buen equilibrio potencia/consumo</li>
+                                <li>Durabilidad en trabajos pesados</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>No tan potente como motores de 15L</li>
+                                <li>Requiere mantenimiento especializado</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Mack MP7.jpg') }}" alt="Mack MP7" class="img-click">
+                        </div>
+                        <h5>Mack MP7</h5>
+                        <p>El MP7 es un motor de 11 litros diseñado para aplicaciones de servicio mediano donde se requiere eficiencia sin sacrificar potencia. Es ideal para rutas regionales, reparto y aplicaciones urbanas donde el peso y el consumo de combustible son críticos.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Mack MP7</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>325 – 415 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1160 – 1460 lb-ft (1573 – 1980 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>10.8 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Excelente economía de combustible</li>
+                                <li>Peso ligero aumenta capacidad de carga</li>
+                                <li>Ideal para rutas urbanas y regionales</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>No recomendado para larga distancia pesada</li>
+                                <li>Menor torque que el MP8</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Mack E7.jpg') }}" alt="Mack E7" class="img-click">
+                        </div>
+                        <h5>Mack E7 <span class="badge-popular">💪 Clásico Mack</span></h5>
+                        <p>El E7 es el motor legendario que construyó la reputación de Mack como fabricante de equipos indestructibles. Con décadas de servicio probado, este motor de 12 litros sigue siendo muy buscado por operadores que valoran la simplicidad y la durabilidad sobre la tecnología moderna.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Mack E7</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>350 – 454 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1200 – 1660 lb-ft (1627 – 2251 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>12.0 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección electrónica V-MAC</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Construcción robusta y duradera</li>
+                                <li>Mantenimiento relativamente simple</li>
+                                <li>Repuestos ampliamente disponibles</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Tecnología de los 90s</li>
+                                <li>Consumo de combustible más alto</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Mack MP10.jpg') }}" alt="Mack MP10" class="img-click">
+                        </div>
+                        <h5>Mack MP10</h5>
+                        <p>El MP10 es el motor más grande de Mack, diseñado específicamente para aplicaciones extremadamente pesadas como minería, construcción y acarreo de sobrecargas. Con 16 litros de cilindrada, ofrece el máximo torque disponible en la línea Mack.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Mack MP10</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>505 – 605 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1860 – 2060 lb-ft (2522 – 2793 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>16.0 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Máxima potencia y torque de Mack</li>
+                                <li>Diseñado para trabajo extremo</li>
+                                <li>Excelente para minería y construcción</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Consumo de combustible elevado</li>
+                                <li>Peso considerable</li>
+                                <li>Costo de operación alto</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VOLVO ==================== -->
+        <section id="volvo" class="brand-section">
+            <div class="brand-header">
+                <h2><span class="brand-logo">🔵</span> Volvo</h2>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Volvo D13.jpg') }}" alt="Volvo D13" class="img-click">
+                        </div>
+                        <h5>Volvo D13</h5>
+                        <p>El Volvo D13 no es solo un motor, es la combinación perfecta de potencia y eficiencia inteligente. Con 12.8 litros y tecnología avanzada de inyección electrónica, está diseñado para entregar torque potente a bajas revoluciones, optimizando cada gota de combustible.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Volvo D13</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>375 – 500 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1550 – 1850 lb-ft (2100 – 2500 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>12.8 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Alta eficiencia en consumo de combustible</li>
+                                <li>Confiabilidad probada</li>
+                                <li>Intervalos largos de mantenimiento</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Costo elevado de reparación</li>
+                                <li>Dependencia de talleres Volvo</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Volvo D16.jpg') }}" alt="Volvo D16" class="img-click">
+                        </div>
+                        <h5>Volvo D16 <span class="badge-popular">💎 Premium</span></h5>
+                        <p>El D16 es el motor insignia de Volvo, diseñado para las aplicaciones más exigentes. Con 16 litros de cilindrada y tecnología de punta, ofrece la máxima potencia y torque disponibles en un camión Volvo, ideal para transporte de sobrecargas y minería.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Volvo D16</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>500 – 750 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>2100 – 3550 lb-ft (2847 – 4813 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>16.1 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Máxima potencia para cargas extremas</li>
+                                <li>Torque excepcional a bajas RPM</li>
+                                <li>Tecnología de última generación</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Precio premium</li>
+                                <li>Consumo de combustible alto</li>
+                                <li>Mantenimiento costoso</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Volvo D11.jpg') }}" alt="Volvo D11" class="img-click">
+                        </div>
+                        <h5>Volvo D11</h5>
+                        <p>El D11 es el motor de entrada de Volvo para aplicaciones de servicio mediano a pesado. Con 11 litros, ofrece un excelente equilibrio entre rendimiento y economía, siendo ideal para flotas que buscan reducir costos operativos sin comprometer calidad.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Volvo D11</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>330 – 425 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>1250 – 1550 lb-ft (1695 – 2101 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>10.8 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Excelente economía de combustible</li>
+                                <li>Peso ligero mejora capacidad de carga</li>
+                                <li>Mantenimiento accesible</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>Limitado para cargas muy pesadas</li>
+                                <li>Menor potencia que D13/D16</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="motor-card">
+                        <div class="img-wrapper">
+                            <img src="{{ url_for('static', filename='img/Volvo D8.jpg') }}" alt="Volvo D8" class="img-click">
+                        </div>
+                        <h5>Volvo D8</h5>
+                        <p>El D8 es el motor más compacto de Volvo, diseñado para aplicaciones de servicio mediano como camiones de reparto urbano y regional. Con 7.7 litros, ofrece eficiencia excepcional y emisiones ultra bajas, ideal para zonas urbanas con restricciones ambientales.</p>
+                        <div class="specs-table">
+                            <table class="table table-sm">
+                                <tr><td><strong>Modelo:</strong></td><td>Volvo D8</td></tr>
+                                <tr><td><strong>Potencia:</strong></td><td>250 – 320 HP</td></tr>
+                                <tr><td><strong>Torque:</strong></td><td>850 – 1200 lb-ft (1153 – 1627 Nm)</td></tr>
+                                <tr><td><strong>Cilindrada:</strong></td><td>7.7 L</td></tr>
+                                <tr><td><strong>Tipo:</strong></td><td>6 cilindros en línea, diésel</td></tr>
+                                <tr><td><strong>Sistema:</strong></td><td>Inyección Common Rail</td></tr>
+                            </table>
+                        </div>
+                        <div class="ventajas">
+                            <strong>✅ Ventajas:</strong>
+                            <ul>
+                                <li>Máxima eficiencia de combustible</li>
+                                <li>Emisiones ultra bajas</li>
+                                <li>Perfecto para entrega urbana</li>
+                            </ul>
+                        </div>
+                        <div class="desventajas">
+                            <strong>⚠️ Desventajas:</strong>
+                            <ul>
+                                <li>No apto para larga distancia pesada</li>
+                                <li>Potencia limitada</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- =====================================================
+         MODAL DE GALERÍA
+    ===================================================== -->
+    <div class="modal fade" id="motorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title" id="modalTitle">Motor</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-img-area" id="modalImgArea">
+                    <div class="nav-arrow left" id="arrowLeft">&#8249;</div>
+                    <img id="modalImage" src="" alt="">
+                    <div class="nav-arrow right" id="arrowRight">&#8250;</div>
+                    <div class="zoom-indicator" id="zoomIndicator">1.0×</div>
+                </div>
+                <div class="thumbnails-row" id="thumbnailsRow"></div>
+                <div class="modal-footer-bar">
+                    <span class="img-counter" id="imgCounter">1 / 1</span>
+                    <span class="zoom-hint">Rueda del mouse para zoom · Arrastra para mover</span>
+                    <button class="zoom-reset-btn" id="zoomResetBtn">Restablecer zoom</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- =====================================================
+         SCRIPT: PARTÍCULAS DE FONDO
+    ===================================================== -->
+    <script>
+    (function () {
+        const canvas = document.getElementById('bg-particles');
+        const ctx    = canvas.getContext('2d');
+        let W, H, pts = [];
+
+        function resize() {
+            W = window.innerWidth;
+            H = window.innerHeight;
+            canvas.width  = W;
+            canvas.height = H;
+        }
+
+        function rand(a, b) { return a + Math.random() * (b - a); }
+
+        function spawn() {
+            return {
+                x: rand(0, W),
+                y: rand(H * 0.05, H * 0.97),
+                r: rand(0.5, 1.9),
+                vx: rand(-0.10, 0.10),
+                vy: rand(-0.28, -0.05),
+                alpha: rand(0.04, 0.22),
+                life: 0,
+                maxLife: rand(180, 420),
+                amber: Math.random() < 0.20
+            };
+        }
+
+        function init() {
+            pts = [];
+            for (let i = 0; i < 80; i++) {
+                const p = spawn();
+                p.life = Math.floor(Math.random() * p.maxLife);
+                pts.push(p);
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+            for (let i = pts.length - 1; i >= 0; i--) {
+                const p  = pts[i];
+                p.life++; p.x += p.vx; p.y += p.vy;
+                const pr   = p.life / p.maxLife;
+                const fade = pr < 0.15 ? pr / 0.15 : pr > 0.75 ? (1 - (pr - 0.75) / 0.25) : 1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.amber
+                    ? `rgba(208,136,16,${p.alpha * fade})`
+                    : `rgba(195,190,178,${p.alpha * fade * 0.55})`;
+                ctx.fill();
+                if (p.life >= p.maxLife) pts[i] = spawn();
+            }
+            requestAnimationFrame(draw);
+        }
+
+        resize(); init(); draw();
+        window.addEventListener('resize', () => { resize(); init(); });
+    })();
+    </script>
+
+    <!-- =====================================================
+         SCRIPT: MODAL + ZOOM + GALERÍA (original)
+    ===================================================== -->
+    <script>
+    (function () {
+        'use strict';
+
+        const allImgs    = Array.from(document.querySelectorAll('.img-click'));
+        const modal      = new bootstrap.Modal(document.getElementById('motorModal'), { backdrop: true });
+        const modalEl    = document.getElementById('motorModal');
+        const modalImg   = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modalTitle');
+        const imgArea    = document.getElementById('modalImgArea');
+        const thumbsRow  = document.getElementById('thumbnailsRow');
+        const counter    = document.getElementById('imgCounter');
+        const arrowL     = document.getElementById('arrowLeft');
+        const arrowR     = document.getElementById('arrowRight');
+        const zoomInd    = document.getElementById('zoomIndicator');
+        const zoomReset  = document.getElementById('zoomResetBtn');
+
+        let currentIdx = 0, zoomScale = 1, panX = 0, panY = 0;
+        let isDragging = false, dragStartX = 0, dragStartY = 0, panStartX = 0, panStartY = 0;
+        let zoomHideTimer = null;
+        const MIN_ZOOM = 1, MAX_ZOOM = 3;
+
+        allImgs.forEach((img, i) => {
+            const t = document.createElement('div');
+            t.className = 'thumb';
+            t.innerHTML = `<img src="${img.src}" alt="${img.alt}">`;
+            t.addEventListener('click', () => goTo(i));
+            thumbsRow.appendChild(t);
+        });
+        const thumbEls = thumbsRow.querySelectorAll('.thumb');
+
+        function flyAndOpen(clickedImg, targetIdx) {
+            const rect  = clickedImg.getBoundingClientRect();
+            const vw    = window.innerWidth, vh = window.innerHeight;
+            const clone = document.createElement('img');
+            clone.src   = clickedImg.src;
+            clone.className = 'flying-clone';
+            clone.style.cssText = `left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;opacity:1;`;
+            document.body.appendChild(clone);
+            clone.getBoundingClientRect();
+            const destW = Math.min(vw * 0.6, 800);
+            const destH = destW * (rect.height / rect.width);
+            clone.style.left         = `${(vw - destW) / 2}px`;
+            clone.style.top          = `${(vh - destH) / 2}px`;
+            clone.style.width        = `${destW}px`;
+            clone.style.height       = `${destH}px`;
+            clone.style.borderRadius = '18px';
+            clone.style.opacity      = '0';
+            clone.addEventListener('transitionend', () => {
+                clone.remove(); goTo(targetIdx, false); modal.show();
+            }, { once: true });
+        }
+
+        function goTo(idx, animate = true) {
+            currentIdx = (idx + allImgs.length) % allImgs.length;
+            const img  = allImgs[currentIdx];
+            resetZoom(false);
+            if (animate) {
+                modalImg.style.opacity   = '0';
+                modalImg.style.transform = `translate(-50%,-50%) scale(0.92)`;
+                setTimeout(() => {
+                    modalImg.src = img.src; modalImg.alt = img.alt;
+                    modalImg.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
+                    modalImg.style.opacity    = '1';
+                    modalImg.style.transform  = `translate(-50%,-50%) scale(1)`;
+                }, 120);
+            } else {
+                modalImg.src = img.src; modalImg.alt = img.alt;
+                modalImg.style.opacity   = '1';
+                modalImg.style.transform = `translate(-50%,-50%) scale(1)`;
+            }
+            modalTitle.textContent = img.alt || `Motor ${currentIdx + 1}`;
+            counter.textContent    = `${currentIdx + 1} / ${allImgs.length}`;
+            thumbEls.forEach((t, i) => t.classList.toggle('active', i === currentIdx));
+            thumbEls[currentIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        function applyTransform(smooth = true) {
+            modalImg.style.transition = smooth ? 'transform 0.22s cubic-bezier(0.4,0,0.2,1)' : 'none';
+            modalImg.style.transform  = `translate(calc(-50% + ${panX}px), calc(-50% + ${panY}px)) scale(${zoomScale})`;
+            zoomInd.textContent = `${zoomScale.toFixed(1)}×`;
+            zoomInd.classList.toggle('visible', zoomScale > 1);
+            clearTimeout(zoomHideTimer);
+            if (zoomScale > 1) zoomHideTimer = setTimeout(() => zoomInd.classList.remove('visible'), 1500);
+        }
+
+        function clampPan() {
+            if (zoomScale <= 1) { panX = 0; panY = 0; return; }
+            const area = imgArea.getBoundingClientRect();
+            const imgW = modalImg.naturalWidth  || modalImg.clientWidth;
+            const imgH = modalImg.naturalHeight || modalImg.clientHeight;
+            const limX = Math.max(0, (imgW * zoomScale - area.width)  / 2);
+            const limY = Math.max(0, (imgH * zoomScale - area.height) / 2);
+            panX = Math.max(-limX, Math.min(limX, panX));
+            panY = Math.max(-limY, Math.min(limY, panY));
+        }
+
+        function resetZoom(smooth = true) {
+            zoomScale = 1; panX = 0; panY = 0;
+            applyTransform(smooth);
+            imgArea.style.cursor = 'grab';
+        }
+
+        imgArea.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            zoomScale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomScale + (e.deltaY < 0 ? 0.18 : -0.18)));
+            if (zoomScale === 1) { panX = 0; panY = 0; }
+            clampPan(); applyTransform();
+        }, { passive: false });
+
+        imgArea.addEventListener('mousedown', (e) => {
+            if (zoomScale <= 1) return;
+            isDragging = true; dragStartX = e.clientX; dragStartY = e.clientY;
+            panStartX = panX; panStartY = panY;
+            imgArea.classList.add('dragging');
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = panStartX + (e.clientX - dragStartX);
+            panY = panStartY + (e.clientY - dragStartY);
+            clampPan(); applyTransform(false);
+        });
+        window.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false; imgArea.classList.remove('dragging');
+        });
+
+        let lastTouchDist = null;
+        imgArea.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            } else if (e.touches.length === 1 && zoomScale > 1) {
+                isDragging = true; dragStartX = e.touches[0].clientX; dragStartY = e.touches[0].clientY;
+                panStartX = panX; panStartY = panY;
+            }
+        }, { passive: true });
+        imgArea.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && lastTouchDist !== null) {
+                e.preventDefault();
+                const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                zoomScale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomScale * (dist / lastTouchDist)));
+                lastTouchDist = dist; clampPan(); applyTransform(false);
+            } else if (e.touches.length === 1 && isDragging) {
+                panX = panStartX + (e.touches[0].clientX - dragStartX);
+                panY = panStartY + (e.touches[0].clientY - dragStartY);
+                clampPan(); applyTransform(false);
+            }
+        }, { passive: false });
+        imgArea.addEventListener('touchend', () => { lastTouchDist = null; isDragging = false; });
+
+        zoomReset.addEventListener('click', resetZoom);
+        arrowL.addEventListener('click', () => goTo(currentIdx - 1));
+        arrowR.addEventListener('click', () => goTo(currentIdx + 1));
+        document.addEventListener('keydown', (e) => {
+            if (!modalEl.classList.contains('show')) return;
+            if (e.key === 'ArrowLeft')  goTo(currentIdx - 1);
+            if (e.key === 'ArrowRight') goTo(currentIdx + 1);
+            if (e.key === 'Escape')     modal.hide();
+        });
+
+        allImgs.forEach((img, i) => {
+            img.parentElement.style.cursor = 'zoom-in';
+            img.parentElement.addEventListener('click', () => flyAndOpen(img, i));
+        });
+
+        modalEl.addEventListener('hidden.bs.modal', resetZoom);
+    })();
+    </script>
+</body>
+</html>

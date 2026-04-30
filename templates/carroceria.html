@@ -1,0 +1,614 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    /* =============================================
+       BASE & BODY
+    ============================================= */
+    body {
+        background-color: #f4f6f9;
+    }
+
+    /* =============================================
+       BACK BUTTON
+    ============================================= */
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        color: #667eea;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    
+    .back-button:hover {
+        background: #667eea;
+        color: white;
+        transform: translateX(-5px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .back-button::before {
+        content: "←";
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+
+    /* =============================================
+       HERO SECTION — Animated Gradient
+    ============================================= */
+    @keyframes gradientShift {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .hero-section {
+        background: linear-gradient(135deg, #667eea, #764ba2, #43a6d9, #667eea);
+        background-size: 300% 300%;
+        animation: gradientShift 8s ease infinite;
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .hero-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: bold;
+    }
+    
+    .hero-section p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+    }
+    
+    /* =============================================
+       COMPARISON SECTION
+    ============================================= */
+    .comparison-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin: 3rem 0;
+    }
+    
+    @media (max-width: 768px) {
+        .comparison-section {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* =============================================
+       TRUCK CARDS — Enhanced Hover
+    ============================================= */
+    .truck-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    box-shadow 0.35s ease;
+        will-change: transform;
+    }
+    
+    .truck-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 45px rgba(102, 126, 234, 0.22);
+    }
+    
+    .truck-card h3 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .flag {
+        font-size: 2rem;
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .feature-list li {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e5e5e5;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .feature-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .feature-icon {
+        color: #667eea;
+        font-weight: bold;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    /* =============================================
+       TYPES SECTION
+    ============================================= */
+    .types-section {
+        margin: 3rem 0;
+    }
+    
+    /* =============================================
+       ACCORDION — Enhanced Animations
+    ============================================= */
+    @keyframes accordionFadeSlide {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .accordion-item {
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .accordion-item:has(.accordion-content.active) {
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.15);
+    }
+    
+    .accordion-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.3s ease, transform 0.12s ease;
+        user-select: none;
+    }
+    
+    .accordion-header:hover {
+        background: linear-gradient(135deg, #e8ecf1 0%, #b8c6db 100%);
+    }
+
+    /* Click press feedback */
+    .accordion-header:active,
+    .accordion-header.pressed {
+        transform: scale(0.98);
+    }
+    
+    .accordion-header h4 {
+        margin: 0;
+        font-size: 1.3rem;
+        color: #333;
+    }
+    
+    .accordion-toggle {
+        font-size: 1.5rem;
+        color: #667eea;
+        font-weight: bold;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: inline-block;
+    }
+    
+    .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                    padding 0.3s ease;
+        padding: 0 1.5rem;
+    }
+    
+    .accordion-content.active {
+        max-height: 800px;
+        padding: 1.5rem;
+        animation: accordionFadeSlide 0.4s ease forwards;
+    }
+    
+    /* =============================================
+       INFO GRID & INFO CARDS — Enhanced Hover
+    ============================================= */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 3rem 0;
+    }
+    
+    .info-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border-left: 4px solid #667eea;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    box-shadow 0.35s ease;
+        will-change: transform;
+    }
+
+    .info-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 14px 35px rgba(102, 126, 234, 0.18);
+    }
+    
+    .info-card h5 {
+        color: #667eea;
+        margin-bottom: 0.75rem;
+        font-size: 1.1rem;
+    }
+    
+    .info-card p {
+        color: #555;
+        line-height: 1.6;
+    }
+    
+    /* =============================================
+       HIGHLIGHT BOX — Enhanced Hover
+    ============================================= */
+    .highlight {
+        background: #fff3cd;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+        margin: 2rem 0;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    box-shadow 0.35s ease;
+        will-change: transform;
+    }
+
+    .highlight:hover {
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 10px 28px rgba(255, 193, 7, 0.25);
+    }
+
+    /* =============================================
+       SCROLL REVEAL — Intersection Observer
+    ============================================= */
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Staggered delay helpers */
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+</style>
+
+<!-- =============================================
+     HERO SECTION
+============================================= -->
+<div class="hero-section">
+    <h2>🚛 Carrocería de Camiones</h2>
+    <p>La carrocería es el alma del camión: protege al conductor, resguarda la carga y define su propósito. Desde diseños aerodinámicos hasta estructuras robustas, cada carrocería cuenta una historia de ingeniería y funcionalidad.</p>
+</div>
+
+<!-- =============================================
+     COMPARISON SECTION
+============================================= -->
+<div class="comparison-section">
+    <div class="truck-card reveal reveal-delay-1">
+        <h3><span class="flag">🇺🇸</span> Camiones Americanos</h3>
+        <ul class="feature-list">
+            <li>
+                <span class="feature-icon">🔷</span>
+                <div>
+                    <strong>Diseño con Morro Largo:</strong> El motor está ubicado en el frente, creando esa característica "trompa" que los hace inconfundibles. Esto mejora la estabilidad y facilita el mantenimiento.
+                </div>
+            </li>
+            <li>
+                <span class="feature-icon">🏠</span>
+                <div>
+                    <strong>Cabinas Espaciosas:</strong> Diseñadas como verdaderos hogares rodantes. Los conductores pueden estar de pie, dormir cómodamente y pasar días sin salir del vehículo.
+                </div>
+            </li>
+            <li>
+                <span class="feature-icon">🎨</span>
+                <div>
+                    <strong>Colores Llamativos:</strong> Cromados brillantes y pintura vibrante. El diseño busca destacar y ser visible en las largas carreteras rectas de América.
+                </div>
+            </li>
+            <li>
+                <span class="feature-icon">🛣️</span>
+                <div>
+                    <strong>Optimizados para Largas Distancias:</strong> Sin límites estrictos de longitud, pueden ser más largos y están diseñados para autopistas anchas y rectas.
+                </div>
+            </li>
+            <li>
+                <span class="feature-icon">⚙️</span>
+                <div>
+                    <strong>Tecnología Tradicional:</strong> Muchos mantienen sistemas analógicos, aunque esto está cambiando gradualmente hacia sistemas más modernos.
+                </div>
+            </li>
+        </ul>
+        <p style="margin-top: 1.5rem; color: #666; font-style: italic;">
+            <strong>Marcas principales:</strong> Kenworth, Peterbilt, Freightliner, Mack, International
+        </p>
+    </div>
+
+    <div class="truck-card reveal reveal-delay-2">
+        <h3><span class="flag">🇪🇺</span> Camiones Europeos</h3>
+        <ul class="feature-list">
+            <li>
+                <span class="feature-icon">🔷</span>
+                <div>
+                    <strong>Diseño Cab-Over (Morro Plano):</strong> El motor está bajo la cabina, creando un frente chato. Esto maximiza la longitud de carga respetando el límite de 16.5 metros.
+                </div>
+            </li>
+            <li>
+                <span class="feature-icon">🎯</span>
+                <div>
+                    <strong>Maniobrabilidad Superior:</strong> Diseñados para carreteras estrechas, sinuosas y montañosas. El frente plano mejora la visibilidad y facilita las maniobras.
+                </div>
+            </li>
+            <li>
+                <span class="feature-icon">🌱</span>
+                <div>
+                    <strong>Eficiencia Ecológica:</strong> Cumplen con estrictas normativas Euro VI. Motores potentes pero con bajas emisiones y menor consumo de combustible.
+                </div>
+            </li>
+            <li>
+                <span class="feature-icon">💻</span>
+                <div>
+                    <strong>Tecnología Avanzada:</strong> Equipados con sistemas electrónicos de última generación: asistentes de conducción, sensores y optimización de rutas.
+                </div>
+            </li>
+            <li>
+                <span class="feature-icon">🎨</span>
+                <div>
+                    <strong>Colores Sobrios:</strong> Tonos oscuros y diseños discretos que buscan integrarse con el entorno, no destacar de él.
+                </div>
+            </li>
+        </ul>
+        <p style="margin-top: 1.5rem; color: #666; font-style: italic;">
+            <strong>Marcas principales:</strong> Mercedes-Benz, Scania, Volvo, MAN, DAF, Renault
+        </p>
+    </div>
+</div>
+
+<!-- HIGHLIGHT -->
+<div class="highlight reveal">
+    <h4 style="margin-top: 0; color: #856404;">⚡ Dato Clave</h4>
+    <p style="margin-bottom: 0; color: #856404;">Los camiones europeos son más <strong>potentes</strong> (por ser más ligeros y compactos), pero los americanos son más <strong>rápidos</strong> gracias a su eje de mayor longitud. La diferencia no es casualidad: cada uno está perfectamente adaptado a su terreno y normativa.</p>
+</div>
+
+<!-- =============================================
+     TYPES SECTION — ACCORDION
+============================================= -->
+<div class="types-section">
+    <h3 style="font-size: 2rem; margin-bottom: 2rem; color: #333;">📦 Tipos de Carrocería según su Función</h3>
+    
+    <div class="accordion-item reveal reveal-delay-1">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            <h4>🚚 Carrocería Cerrada (Furgón)</h4>
+            <span class="accordion-toggle">+</span>
+        </div>
+        <div class="accordion-content">
+            <p><strong>Uso:</strong> Transporte de mercancía general que requiere protección contra la intemperie.</p>
+            <p><strong>Características:</strong></p>
+            <ul>
+                <li>Caja completamente cerrada y sellada</li>
+                <li>Protección total contra lluvia, polvo y robos</li>
+                <li>Puede incluir sistemas de refrigeración</li>
+                <li>Ideal para electrodomésticos, muebles, paquetería</li>
+            </ul>
+            <p><strong>Ventajas:</strong> Máxima seguridad de la carga, versatilidad.</p>
+        </div>
+    </div>
+
+    <div class="accordion-item reveal reveal-delay-2">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            <h4>🧊 Carrocería Frigorífica</h4>
+            <span class="accordion-toggle">+</span>
+        </div>
+        <div class="accordion-content">
+            <p><strong>Uso:</strong> Transporte de productos perecederos que requieren temperatura controlada.</p>
+            <p><strong>Características:</strong></p>
+            <ul>
+                <li>Sistema de refrigeración integrado</li>
+                <li>Paredes aisladas térmicamente</li>
+                <li>Control de temperatura desde -25°C hasta +25°C</li>
+                <li>Esencial para alimentos, medicinas, flores</li>
+            </ul>
+            <p><strong>Ventajas:</strong> Conserva la cadena de frío, cumple normativas sanitarias.</p>
+        </div>
+    </div>
+
+    <div class="accordion-item reveal reveal-delay-3">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            <h4>📦 Carrocería de Plataforma Abierta</h4>
+            <span class="accordion-toggle">+</span>
+        </div>
+        <div class="accordion-content">
+            <p><strong>Uso:</strong> Carga pesada, maquinaria, materiales de construcción.</p>
+            <p><strong>Características:</strong></p>
+            <ul>
+                <li>Superficie plana sin laterales ni techo</li>
+                <li>Facilita carga y descarga con grúas</li>
+                <li>Permite transportar objetos de gran tamaño</li>
+                <li>Se asegura con cadenas o correas</li>
+            </ul>
+            <p><strong>Ventajas:</strong> Versatilidad para cargas irregulares, fácil acceso.</p>
+        </div>
+    </div>
+
+    <div class="accordion-item reveal reveal-delay-1">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            <h4>🎪 Carrocería de Lona (Tauliner)</h4>
+            <span class="accordion-toggle">+</span>
+        </div>
+        <div class="accordion-content">
+            <p><strong>Uso:</strong> Transporte flexible que requiere carga y descarga lateral.</p>
+            <p><strong>Características:</strong></p>
+            <ul>
+                <li>Laterales de lona corredera</li>
+                <li>Estructura de arcos metálicos</li>
+                <li>Carga lateral, trasera y superior</li>
+                <li>Popular en Europa por su versatilidad</li>
+            </ul>
+            <p><strong>Ventajas:</strong> Rapidez en carga/descarga, protección básica, adaptabilidad.</p>
+        </div>
+    </div>
+
+    <div class="accordion-item reveal reveal-delay-2">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            <h4>🚛 Carrocería Cisterna</h4>
+            <span class="accordion-toggle">+</span>
+        </div>
+        <div class="accordion-content">
+            <p><strong>Uso:</strong> Transporte de líquidos y gases.</p>
+            <p><strong>Características:</strong></p>
+            <ul>
+                <li>Tanque cilíndrico de acero o aluminio</li>
+                <li>Compartimentos internos para diferentes líquidos</li>
+                <li>Sistemas de bombeo y válvulas</li>
+                <li>Para combustibles, químicos, alimentos líquidos</li>
+            </ul>
+            <p><strong>Ventajas:</strong> Transporte seguro de líquidos, cumple normativas ADR.</p>
+        </div>
+    </div>
+
+    <div class="accordion-item reveal reveal-delay-3">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+            <h4>🏗️ Carrocería Volquete</h4>
+            <span class="accordion-toggle">+</span>
+        </div>
+        <div class="accordion-content">
+            <p><strong>Uso:</strong> Construcción, minería, transporte de materiales a granel.</p>
+            <p><strong>Características:</strong></p>
+            <ul>
+                <li>Caja basculante hidráulica</li>
+                <li>Descarga por gravedad hacia atrás o lateral</li>
+                <li>Estructura reforzada para cargas pesadas</li>
+                <li>Transporta arena, grava, escombros, tierra</li>
+            </ul>
+            <p><strong>Ventajas:</strong> Descarga rápida y eficiente, alta resistencia.</p>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     INFO GRID
+============================================= -->
+<div class="info-grid">
+    <div class="info-card reveal reveal-delay-1">
+        <h5>🔧 Materiales de Construcción</h5>
+        <p>Las carrocerías modernas usan acero de alta resistencia, aluminio (más ligero) y materiales compuestos. La elección depende del balance entre peso, durabilidad y costo.</p>
+    </div>
+    
+    <div class="info-card reveal reveal-delay-2">
+        <h5>💨 Aerodinámica</h5>
+        <p>Los diseños actuales incorporan deflectores, faldones laterales y techos curvos para reducir resistencia al viento. Esto puede ahorrar hasta un 15% de combustible.</p>
+    </div>
+    
+    <div class="info-card reveal reveal-delay-3">
+        <h5>🛡️ Normativas de Seguridad</h5>
+        <p>Las carrocerías deben cumplir estándares como ECE R29 (resistencia de cabina) y regulaciones específicas según el tipo de carga (ADR para mercancías peligrosas).</p>
+    </div>
+    
+    <div class="info-card reveal reveal-delay-4">
+        <h5>🎯 Personalización</h5>
+        <p>Muchas empresas personalizan sus carrocerías con branding, sistemas especiales de sujeción y modificaciones según sus necesidades logísticas específicas.</p>
+    </div>
+</div>
+
+<!-- =============================================
+     JAVASCRIPT
+============================================= -->
+<script>
+/* ------------------------------------------
+   ACCORDION TOGGLE
+   (preserva lógica original + mejoras)
+------------------------------------------ */
+function toggleAccordion(header) {
+    // Click press feedback
+    header.classList.add('pressed');
+    setTimeout(() => header.classList.remove('pressed'), 150);
+
+    const content = header.nextElementSibling;
+    const toggle  = header.querySelector('.accordion-toggle');
+    
+    // Cerrar otros acordeones
+    document.querySelectorAll('.accordion-content').forEach(item => {
+        if (item !== content && item.classList.contains('active')) {
+            item.classList.remove('active');
+            const otherToggle = item.previousElementSibling.querySelector('.accordion-toggle');
+            otherToggle.textContent = '+';
+            otherToggle.style.transform = 'rotate(0deg)';
+        }
+    });
+    
+    // Toggle el acordeón actual
+    const isOpening = !content.classList.contains('active');
+    content.classList.toggle('active');
+
+    if (isOpening) {
+        toggle.textContent = '−';
+        toggle.style.transform = 'rotate(180deg)';
+
+        // Scroll suave hacia el acordeón abierto
+        setTimeout(() => {
+            header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    } else {
+        toggle.textContent = '+';
+        toggle.style.transform = 'rotate(0deg)';
+    }
+}
+
+/* ------------------------------------------
+   INTERSECTION OBSERVER — Scroll Reveal
+------------------------------------------ */
+(function initScrollReveal() {
+    const revealElements = document.querySelectorAll('.reveal');
+
+    if (!revealElements.length) return;
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // Una vez visible, dejar de observar
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        {
+            threshold: 0.12,   // Aparece cuando el 12% del elemento es visible
+            rootMargin: '0px 0px -40px 0px'
+        }
+    );
+
+    revealElements.forEach(el => observer.observe(el));
+})();
+</script>
+
+<a href="{{ url_for('index') }}" class="back-button">Volver al Inicio</a>
+
+{% endblock %}

@@ -1,0 +1,1143 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    /* ====================== ESTILOS GLOBALES ====================== */
+    body {
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1920") center/cover;
+        opacity: 0.06;
+        z-index: -1;
+    }
+
+    /* ====================== ANIMACIONES ====================== */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-60px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes rotateIn {
+        from {
+            opacity: 0;
+            transform: rotate(-180deg) scale(0.5);
+        }
+        to {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+
+    /* ====================== CONTENEDOR PRINCIPAL ====================== */
+    .container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    /* ====================== BOTÓN RETROCEDER ====================== */
+    .back-button {
+        display: inline-block;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: #fff;
+        padding: 14px 35px;
+        border-radius: 50px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        animation: slideInLeft 0.8s ease-out;
+        margin-bottom: 30px;
+        font-size: 1rem;
+    }
+
+    .back-button:hover {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        border-color: #ff6b35;
+        transform: translateX(-8px);
+        box-shadow: 0 8px 30px rgba(255, 107, 53, 0.4);
+        color: #fff;
+    }
+
+    /* ====================== HERO HEADER ====================== */
+    .hero-header {
+        background: linear-gradient(135deg, rgba(15, 32, 39, 0.95) 0%, rgba(44, 83, 100, 0.95) 100%);
+        backdrop-filter: blur(15px);
+        padding: 60px 40px;
+        border-radius: 25px;
+        text-align: center;
+        margin-bottom: 50px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        animation: fadeInUp 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    .hero-header .gear-icon {
+        font-size: 4rem;
+        display: inline-block;
+        animation: rotateIn 1s ease-out;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 0 20px rgba(255, 107, 53, 0.5));
+    }
+
+    .hero-header h1 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, #ff6b35, #f7931e, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 20px rgba(255, 107, 53, 0.3);
+        animation: fadeInUp 1s ease-out 0.2s both;
+    }
+
+    .hero-header .subtitle {
+        color: #ecf0f1;
+        font-size: 1.3rem;
+        line-height: 1.8;
+        max-width: 900px;
+        margin: 0 auto;
+        animation: fadeInUp 1s ease-out 0.4s both;
+    }
+
+    /* ====================== CONTENT BOX ====================== */
+    .content-box {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(236, 240, 241, 0.98) 100%);
+        backdrop-filter: blur(10px);
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 40px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: fadeInUp 0.8s ease-out;
+        position: relative;
+    }
+
+    .content-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #ff6b35, #f7931e, #ffd700, #ff6b35);
+        background-size: 200% 100%;
+        animation: shimmer 3s linear infinite;
+    }
+
+    /* ====================== TÍTULOS ====================== */
+    h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #2c3e50;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #ff6b35;
+        position: relative;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    h2::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 100px;
+        height: 3px;
+        background: #ffd700;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #34495e;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
+
+    /* ====================== PÁRRAFOS Y TEXTO ====================== */
+    p {
+        color: #555;
+        line-height: 1.9;
+        font-size: 1.05rem;
+        text-align: justify;
+        margin-bottom: 20px;
+    }
+
+    .intro-text {
+        font-size: 1.15rem;
+        color: #2c3e50;
+        font-weight: 500;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 5px solid #ff6b35;
+        margin-bottom: 30px;
+    }
+
+    /* ====================== HIGHLIGHT BOX ====================== */
+    .highlight {
+        background: linear-gradient(135deg, #e8f4f8 0%, #d6eaf8 100%);
+        padding: 25px;
+        border-left: 6px solid #3498db;
+        border-radius: 12px;
+        margin: 30px 0;
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .highlight p {
+        color: #2c3e50;
+        font-weight: 500;
+        margin-bottom: 0;
+    }
+
+    /* ====================== TIPOS DE DIFERENCIALES ====================== */
+    .differential-types {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin: 40px 0;
+    }
+
+    .type-card {
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid transparent;
+        animation: fadeInUp 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .type-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #ff6b35, #f7931e);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+
+    .type-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .type-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(255, 107, 53, 0.3);
+        border-color: #ff6b35;
+    }
+
+    .type-card .icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        display: block;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .type-card h4 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+
+    .type-card p {
+        color: #555;
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    /* ====================== GALERÍA DE IMÁGENES ====================== */
+    .img-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin: 50px 0;
+    }
+
+    .img-card {
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        transition: all 0.4s ease;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .img-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(255, 107, 53, 0.3);
+    }
+
+    .img-card img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    .img-card:hover img {
+        transform: scale(1.1);
+    }
+
+    .img-card .caption {
+        padding: 20px;
+        text-align: center;
+        background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+    }
+
+    .img-card .caption h5 {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 1.2rem;
+    }
+
+    .img-card .caption p {
+        color: #777;
+        font-size: 0.95rem;
+        margin-bottom: 0;
+        text-align: center;
+    }
+
+    /* ====================== LISTAS MEJORADAS ====================== */
+    .features-list {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 15px;
+        margin: 30px 0;
+    }
+
+    .features-list ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .features-list li {
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        background: #fff;
+        border-radius: 10px;
+        border-left: 5px solid #ff6b35;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .features-list li:hover {
+        transform: translateX(10px);
+        box-shadow: 0 5px 20px rgba(255, 107, 53, 0.2);
+    }
+
+    .features-list li strong {
+        color: #2c3e50;
+        font-size: 1.1rem;
+    }
+
+    /* ====================== NOTA/DATO CURIOSO ====================== */
+    .info-box {
+        background: linear-gradient(135deg, #fff9e6 0%, #fff3cc 100%);
+        padding: 25px;
+        border-left: 6px solid #ffd700;
+        border-radius: 12px;
+        margin: 40px 0;
+        box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .info-box strong {
+        color: #f39c12;
+        font-size: 1.2rem;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .info-box p {
+        color: #555;
+        margin-bottom: 0;
+    }
+
+    /* ====================== TABLA TÉCNICA ====================== */
+    .tech-table {
+        width: 100%;
+        background: #fff;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin: 30px 0;
+    }
+
+    .tech-table thead {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: #fff;
+    }
+
+    .tech-table th {
+        padding: 20px;
+        font-weight: 700;
+        text-align: left;
+        font-size: 1.1rem;
+    }
+
+    .tech-table td {
+        padding: 18px 20px;
+        border-bottom: 1px solid #ecf0f1;
+        color: #555;
+    }
+
+    .tech-table tr:hover {
+        background: #f8f9fa;
+    }
+
+    /* ====================== STATS BOXES ====================== */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 25px;
+        margin: 40px 0;
+    }
+
+    .stat-box {
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .stat-box:hover {
+        transform: translateY(-10px);
+        border-color: #ff6b35;
+        box-shadow: 0 15px 40px rgba(255, 107, 53, 0.3);
+    }
+
+    .stat-box .stat-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .stat-box .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #ff6b35;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .stat-box .stat-label {
+        color: #555;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    /* ====================== CONCLUSIÓN ====================== */
+    .conclusion-box {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: #fff;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        margin-top: 50px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .conclusion-box h3 {
+        color: #ffd700;
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+    }
+
+    .conclusion-box p {
+        color: #ecf0f1;
+        font-size: 1.15rem;
+        line-height: 1.9;
+        text-align: center;
+    }
+
+    /* ====================== RESPONSIVE ====================== */
+    @media (max-width: 768px) {
+        .hero-header h1 {
+            font-size: 2.5rem;
+        }
+
+        .hero-header .subtitle {
+            font-size: 1.1rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        .content-box {
+            padding: 25px;
+        }
+
+        .img-card img {
+            height: 200px;
+        }
+    }
+
+    /* Animaciones escalonadas */
+    .type-card:nth-child(1) { animation-delay: 0.1s; }
+    .type-card:nth-child(2) { animation-delay: 0.2s; }
+    .type-card:nth-child(3) { animation-delay: 0.3s; }
+    .type-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .img-card:nth-child(1) { animation-delay: 0.1s; }
+    .img-card:nth-child(2) { animation-delay: 0.2s; }
+    .img-card:nth-child(3) { animation-delay: 0.3s; }
+    .img-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .features-list li:nth-child(1) { animation-delay: 0.1s; }
+    .features-list li:nth-child(2) { animation-delay: 0.2s; }
+    .features-list li:nth-child(3) { animation-delay: 0.3s; }
+    .features-list li:nth-child(4) { animation-delay: 0.4s; }
+    .features-list li:nth-child(5) { animation-delay: 0.5s; }
+</style>
+
+<div class="container">
+    <a href="{{ url_for('index') }}" class="back-button">⬅ Volver al Inicio</a>
+
+    <!-- HERO HEADER -->
+    <div class="hero-header">
+        <span class="gear-icon">⚙️</span>
+        <h1>Diferenciales de Camiones Pesados</h1>
+        <p class="subtitle">
+            El diferencial es el corazón del sistema de tracción. Descubre cómo esta ingeniosa pieza mecánica permite 
+            que tu camión tome curvas sin perder potencia, mantenga la tracción en terrenos difíciles y distribuya 
+            el torque de manera inteligente entre las ruedas.
+        </p>
+    </div>
+
+    <!-- INTRODUCCIÓN -->
+    <div class="content-box">
+        <p class="intro-text">
+            🔧 El <strong>diferencial</strong> es una parte esencial del sistema de transmisión en camiones y otros vehículos. 
+            Su función principal es permitir que las ruedas de un mismo eje giren a diferentes velocidades, algo crucial al tomar curvas, 
+            manteniendo la estabilidad y evitando el desgaste prematuro de los neumáticos.
+        </p>
+
+        <div class="highlight">
+            <p>
+                💡 <strong>¿Sabías que...</strong> Sin el diferencial, las ruedas de un mismo eje estarían obligadas a girar a la misma velocidad, 
+                lo que causaría que una de ellas patinara en cada curva, generando desgaste excesivo, pérdida de control y daños severos 
+                en la transmisión. El diferencial resuelve este problema de forma mecánica y elegante.
+            </p>
+        </div>
+    </div>
+
+    <!-- ESTADÍSTICAS -->
+    <div class="stats-container">
+        <div class="stat-box">
+            <span class="stat-icon">🔩</span>
+            <span class="stat-number">40+</span>
+            <span class="stat-label">Componentes Internos</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-icon">💪</span>
+            <span class="stat-number">3000+</span>
+            <span class="stat-label">Nm de Torque</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-icon">🛠️</span>
+            <span class="stat-number">100K+</span>
+            <span class="stat-label">Km de Durabilidad</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-icon">⚡</span>
+            <span class="stat-number">95%</span>
+            <span class="stat-label">Eficiencia Mecánica</span>
+        </div>
+    </div>
+
+    <!-- TIPOS DE DIFERENCIALES -->
+    <div class="content-box">
+        <h2>🔧 Tipos de Diferenciales</h2>
+        
+        <div class="differential-types">
+            <div class="type-card">
+                <span class="icon">🔓</span>
+                <h4>1. Diferencial Abierto</h4>
+                <p>
+                    Es el más común en vehículos comerciales ligeros. Divide el par de manera equitativa entre las dos ruedas del eje. 
+                    <strong>Ventaja:</strong> Simplicidad y bajo costo. <strong>Desventaja:</strong> Pérdida de tracción si una rueda 
+                    patina. Usado en camiones medianos y autobuses urbanos.
+                </p>
+            </div>
+
+            <div class="type-card">
+                <span class="icon">⚡</span>
+                <h4>2. Diferencial LSD</h4>
+                <p>
+                    <strong>(Limited Slip Differential)</strong> Mejora la tracción aplicando más par a la rueda con mayor agarre mediante 
+                    embragues internos. Ideal para camiones todoterreno, obras y aplicaciones donde se requiere tracción en superficies 
+                    mixtas.
+                </p>
+            </div>
+
+            <div class="type-card">
+                <span class="icon">🔒</span>
+                <h4>3. Diferencial Bloqueable</h4>
+                <p>
+                    Permite bloquear mecánicamente o neumáticamente el giro entre las ruedas del eje, forzándolas a girar a la misma velocidad. 
+                    <strong>Ideal para:</strong> Terrenos fangosos, arenosos, nieve o pendientes extremas. Muy usado en camiones 4x4 pesados 
+                    y militares.
+                </p>
+            </div>
+
+            <div class="type-card">
+                <span class="icon">🎯</span>
+                <h4>4. Diferencial Torsen</h4>
+                <p>
+                    <strong>(Torque Sensing)</strong> Usa engranajes helicoidales para detectar y compensar diferencias de torque automáticamente. 
+                    No requiere embragues ni bloqueos electrónicos. Ofrece respuesta instantánea y es muy eficiente. Usado en vehículos modernos 
+                    de alto rendimiento.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- GALERÍA -->
+    <div class="content-box">
+        <h2>📸 Galería Técnica de Diferenciales</h2>
+        
+        <div class="img-gallery">
+            <div class="img-card">
+                <img src="{{ url_for('static', filename='img/diferencial/diferencial_abierto.jpg') }}" alt="Diferencial Abierto">
+                <div class="caption">
+                    <h5>Diferencial Abierto</h5>
+                    <p>El más común, simple y económico</p>
+                </div>
+            </div>
+
+            <div class="img-card">
+                <img src="{{ url_for('static', filename='img/diferencial/diferencial LSD.jpg') }}" alt="Diferencial LSD">
+                <div class="caption">
+                    <h5>Diferencial LSD</h5>
+                    <p>Deslizamiento limitado para mejor tracción</p>
+                </div>
+            </div>
+
+            <div class="img-card">
+                <img src="{{ url_for('static', filename='img/diferencial/diferencial_bloqueable.jpg') }}" alt="Diferencial Bloqueable">
+                <div class="caption">
+                    <h5>Diferencial Bloqueable</h5>
+                    <p>Para terrenos extremos y off-road</p>
+                </div>
+            </div>
+
+            <div class="img-card">
+                <img src="{{ url_for('static', filename='img/diferencial/difenrencial planetario.jpg') }}" alt="Diferencial Planetario">
+                <div class="caption">
+                    <h5>Diferencial Torsen/Planetario</h5>
+                    <p>Alta tecnología y respuesta instantánea</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÁS UTILIZADOS -->
+    <div class="content-box">
+        <h2>🏆 Los Más Utilizados en la Industria</h2>
+        <p>
+            En el mundo del transporte pesado, los <strong>diferenciales bloqueables</strong> y los <strong>LSD</strong> son los más utilizados 
+            debido a que proporcionan una excelente tracción en condiciones difíciles como lluvia, nieve, barro o arena.
+        </p>
+        <p>
+            Los camiones de marcas premium como <em>Freightliner, Kenworth, Peterbilt, Volvo, Mack y Mercedes-Benz</em> suelen incorporar 
+            estos sistemas para maximizar la estabilidad, seguridad y capacidad de carga en cualquier condición del camino.
+        </p>
+
+        <div class="info-box">
+            <strong>💡 Dato Profesional:</strong>
+            <p>
+                Los diferenciales bloqueables pueden activarse manual o automáticamente según el modelo. En camiones modernos, sensores de 
+                deslizamiento detectan cuándo una rueda pierde tracción y activan el bloqueo en milisegundos, sin intervención del conductor.
+            </p>
+        </div>
+    </div>
+
+    <!-- FUNCIONAMIENTO INTERNO -->
+    <div class="content-box">
+        <h2>🔬 Funcionamiento Interno del Diferencial</h2>
+        <p>
+            El diferencial está compuesto principalmente por:
+        </p>
+        
+        <div class="features-list">
+            <ul>
+                <li>
+                    <strong>🔧 Piñón de Ataque:</strong> Recibe el movimiento del eje de transmisión (cardan) y lo transmite hacia la corona.
+                </li>
+                <li>
+                    <strong>⚙️ Corona Dentada:</strong> Engranaje grande que recibe la potencia del piñón y hace girar toda la carcasa del diferencial.
+                </li>
+                <li>
+                    <strong>🎯 Engranajes Satélites:</strong> Pequeños engranajes que giran libremente sobre un eje transversal, permitiendo que las 
+                    ruedas giren a diferentes velocidades.
+                </li>
+                <li>
+                    <strong>🔩 Engranajes Planetarios:</strong> Conectados a los semiejes de las ruedas, reciben el movimiento de los satélites.
+                </li>
+                <li>
+                    <strong>🛡️ Carcasa del Diferencial:</strong> Contiene todo el conjunto y está llena de aceite de alta viscosidad para lubricar 
+                    y refrigerar los engranajes.
+                </li>
+            </ul>
+        </div>
+
+        <p>
+            Estos engranajes se encargan de compensar la diferencia de velocidad entre las ruedas en las curvas. En camiones pesados, 
+            el diseño del diferencial suele reforzarse con <strong>materiales endurecidos</strong> (acero cromado, cementado o nitrurado) 
+            y lubricación de alta presión (hasta 75W-140) para soportar cargas extremas de hasta 40 toneladas por eje.
+        </p>
+
+        <h3>⚙️ ¿Cómo funciona en una curva?</h3>
+        <p>
+            Cuando el camión gira, la rueda exterior debe recorrer mayor distancia que la interior. Los engranajes sat
+            élites permiten que la rueda exterior gire más rápido mientras la interior gira más lento, manteniendo la potencia 
+            distribuida de manera equilibrada y evitando que el vehículo pierda estabilidad o que las ruedas patinen.
+        </p>
+    </div>
+
+    <!-- MANTENIMIENTO -->
+    <div class="content-box">
+        <h2>🛠️ Mantenimiento del Diferencial</h2>
+        <p>
+            Un mantenimiento adecuado del diferencial es crucial para garantizar su durabilidad y rendimiento óptimo. 
+            Aquí te presentamos las mejores prácticas recomendadas por fabricantes:
+        </p>
+
+        <div class="features-list">
+            <ul>
+                <li>
+                    <strong>🛢️ Cambio de Aceite:</strong> Se recomienda reemplazar el aceite del diferencial cada 60,000 a 100,000 km 
+                    según el uso y las condiciones de operación. En aplicaciones severas (minería, construcción) reducir a 40,000 km.
+                </li>
+                <li>
+                    <strong>🔍 Revisión de Fugas:</strong> Inspeccionar retenes, juntas y la carcasa cada 20,000 km para detectar pérdidas 
+                    de lubricante. Una fuga pequeña puede causar daño catastrófico en pocas horas de operación.
+                </li>
+                <li>
+                    <strong>📏 Verificación del Juego:</strong> El juego excesivo entre engranajes (backlash) indica desgaste en el piñón 
+                    o corona. Debe medirse con reloj comparador y no exceder 0.3mm. Revisar cada 50,000 km.
+                </li>
+                <li>
+                    <strong>🧪 Uso de Aditivos:</strong> Algunos diferenciales LSD requieren aditivos especiales de fricción modificada 
+                    para evitar el "chatter" (vibración o ruido al girar en curvas cerradas).
+                </li>
+                <li>
+                    <strong>🌡️ Temperatura de Operación:</strong> Monitorear la temperatura del diferencial. Si excede los 120°C 
+                    constantemente, puede indicar sobrecarga, aceite inadecuado o daño interno.
+                </li>
+                <li>
+                    <strong>🔊 Atención a Ruidos:</strong> Ruidos como zumbidos, chirridos o golpeteos indican desgaste o daño. 
+                    No ignorar estas señales puede prevenir reparaciones costosas.
+                </li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <strong>⚠️ Señales de Alerta:</strong>
+            <p>
+                Si notas vibración al acelerar, ruidos metálicos, pérdida de aceite o que una rueda gira libremente cuando debería tener 
+                resistencia, detén el vehículo inmediatamente y solicita inspección profesional. Un diferencial dañado puede causar 
+                accidentes graves.
+            </p>
+        </div>
+    </div>
+
+    <!-- TABLA COMPARATIVA -->
+    <div class="content-box">
+        <h2>📊 Tabla Comparativa de Tipos de Diferenciales</h2>
+        
+        <table class="tech-table">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Tracción</th>
+                    <th>Costo</th>
+                    <th>Mantenimiento</th>
+                    <th>Aplicación Ideal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Abierto</strong></td>
+                    <td>Básica</td>
+                    <td>Bajo</td>
+                    <td>Mínimo</td>
+                    <td>Carretera, ciudad, carga ligera</td>
+                </tr>
+                <tr>
+                    <td><strong>LSD</strong></td>
+                    <td>Buena</td>
+                    <td>Medio</td>
+                    <td>Moderado</td>
+                    <td>Terrenos mixtos, construcción ligera</td>
+                </tr>
+                <tr>
+                    <td><strong>Bloqueable</strong></td>
+                    <td>Excelente</td>
+                    <td>Alto</td>
+                    <td>Moderado-Alto</td>
+                    <td>Off-road, minería, militar, nieve</td>
+                </tr>
+                <tr>
+                    <td><strong>Torsen</strong></td>
+                    <td>Muy Buena</td>
+                    <td>Alto</td>
+                    <td>Bajo</td>
+                    <td>Alto rendimiento, carretera, rally</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- DIFERENCIALES DELANTEROS Y TRASEROS -->
+    <div class="content-box">
+        <h2>🚛 Diferenciales en Ejes Delanteros y Traseros</h2>
+        <p>
+            En camiones 4x4 y vehículos todo terreno, los diferenciales están presentes tanto en el eje delantero como en el trasero, 
+            cada uno con características específicas:
+        </p>
+
+        <h3>🔧 Diferencial Trasero:</h3>
+        <p>
+            Es más grande y robusto, ya que soporta la mayor parte del peso y torque del vehículo. En camiones de carga pesada, 
+            puede manejar hasta <strong>3,500 Nm de torque</strong> y cargas de <strong>13 toneladas por eje</strong>. Generalmente 
+            incluye sistema de refrigeración adicional y aceites de mayor viscosidad (75W-140 o 85W-140).
+        </p>
+
+        <h3>🔧 Diferencial Delantero:</h3>
+        <p>
+            Está diseñado para asistir en tracción, especialmente en terrenos difíciles o de baja adherencia. Es más compacto y ligero 
+            que el trasero, ya que su función es complementaria. En camiones modernos puede desconectarse automáticamente cuando no se 
+            necesita, reduciendo el consumo de combustible hasta un <strong>3%</strong>.
+        </p>
+
+        <div class="highlight">
+            <p>
+                🔄 <strong>Sistema de Tracción 4x4:</strong> En configuraciones 4x4, existe además un "diferencial central" o "transfer case" 
+                que distribuye la potencia entre el eje delantero y trasero. Este puede ser abierto, bloqueable o con control electrónico 
+                (como el sistema Torque On-Demand de Volvo).
+            </p>
+        </div>
+    </div>
+
+    <!-- TECNOLOGÍAS MODERNAS -->
+    <div class="content-box">
+        <h2>💻 Tecnologías Modernas en Diferenciales</h2>
+        <p>
+            La evolución tecnológica ha llevado los diferenciales a un nuevo nivel de sofisticación, combinando ingeniería mecánica 
+            tradicional con electrónica avanzada:
+        </p>
+
+        <div class="differential-types">
+            <div class="type-card">
+                <span class="icon">🖥️</span>
+                <h4>Control Electrónico</h4>
+                <p>
+                    Sensores de velocidad en cada rueda detectan pérdida de tracción en milisegundos. La ECU activa el bloqueo 
+                    automáticamente sin intervención del conductor, mejorando seguridad y reduciendo desgaste.
+                </p>
+            </div>
+
+            <div class="type-card">
+                <span class="icon">🎛️</span>
+                <h4>Bloqueo Selectivo</h4>
+                <p>
+                    Sistemas como el de Mercedes-Benz permiten bloquear selectivamente diferencial central, trasero o delantero 
+                    según las condiciones, con hasta 3 niveles de bloqueo progresivo.
+                </p>
+            </div>
+
+            <div class="type-card">
+                <span class="icon">📡</span>
+                <h4>Monitoreo en Tiempo Real</h4>
+                <p>
+                    Camiones Volvo y Scania incorporan telemetría que monitorea temperatura, presión de aceite y desgaste del 
+                    diferencial, alertando al conductor de anomalías antes de que causen daño.
+                </p>
+            </div>
+
+            <div class="type-card">
+                <span class="icon">⚡</span>
+                <h4>Vector Torque Control</h4>
+                <p>
+                    Tecnología que distribuye el torque de forma activa entre las ruedas según la demanda instantánea, mejorando 
+                    maniobrabilidad y estabilidad en curvas a alta velocidad.
+                </p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>🌟 Innovación Destacada:</strong>
+            <p>
+                Algunos camiones Volvo FH y Mercedes-Benz Actros usan diferenciales con control electrónico adaptativo capaces de 
+                ajustarse al tipo de terreno detectado automáticamente (asfalto, grava, barro, nieve), reduciendo hasta un 
+                <strong>5% el consumo de combustible</strong> y mejorando la vida útil de los neumáticos en un <strong>15%</strong>.
+            </p>
+        </div>
+    </div>
+
+    <!-- ESPECIFICACIONES TÉCNICAS -->
+    <div class="content-box">
+        <h2>📐 Especificaciones Técnicas Comunes</h2>
+        
+        <table class="tech-table">
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>Especificación</th>
+                    <th>Material</th>
+                    <th>Vida Útil</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Relación de Transmisión</strong></td>
+                    <td>3.08:1 a 4.88:1</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>Piñón de Ataque</strong></td>
+                    <td>12-18 dientes</td>
+                    <td>Acero cromado cementado</td>
+                    <td>500,000+ km</td>
+                </tr>
+                <tr>
+                    <td><strong>Corona</strong></td>
+                    <td>38-52 dientes</td>
+                    <td>Acero nitrurado</td>
+                    <td>500,000+ km</td>
+                </tr>
+                <tr>
+                    <td><strong>Capacidad de Aceite</strong></td>
+                    <td>3.5 - 6.5 litros</td>
+                    <td>SAE 75W-140 GL-5</td>
+                    <td>60,000 - 100,000 km</td>
+                </tr>
+                <tr>
+                    <td><strong>Torque Máximo</strong></td>
+                    <td>2,500 - 3,500 Nm</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>Peso Aproximado</strong></td>
+                    <td>120 - 280 kg</td>
+                    <td>Hierro fundido/Aluminio</td>
+                    <td>Vida útil del vehículo</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- FABRICANTES PRINCIPALES -->
+    <div class="content-box">
+        <h2>🏭 Principales Fabricantes de Diferenciales</h2>
+        <p>
+            Los diferenciales de alta calidad son fabricados por empresas especializadas que proveen a las principales marcas de camiones:
+        </p>
+
+        <div class="differential-types">
+            <div class="type-card">
+                <span class="icon">🏢</span>
+                <h4>Dana Spicer</h4>
+                <p>
+                    Líder mundial en sistemas de transmisión. Provee diferenciales para Freightliner, Kenworth, Peterbilt y Volvo. 
+                    Especialista en aplicaciones pesadas y fuera de carretera.
+                </p>
+            </div>
+
+            <div class="type-card">
+                <span class="icon">🏢</span>
+                <h4>Eaton</h4>
+                <p>
+                    Reconocido por sus diferenciales NoSPIN y diferenciales electrónicos de última generación. Equipamiento original 
+                    en camiones Mack y International.
+                </p>
+            </div>
+
+            <div class="type-card">
+                <span class="icon">🏢</span>
+                <h4>Meritor</h4>
+                <p>
+                    Especialista en sistemas de tracción para servicio pesado. Sus diferenciales son estándar en muchos camiones 
+                    de construcción y minería.
+                </p>
+            </div>
+
+            <div class="type-card">
+                <span class="icon">🏢</span>
+                <h4>ZF Friedrichshafen</h4>
+                <p>
+                    Fabricante alemán de tecnología premium. Provee diferenciales de alto rendimiento para Mercedes-Benz, MAN y Scania.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROBLEMAS COMUNES -->
+    <div class="content-box">
+        <h2>⚠️ Problemas Comunes y Soluciones</h2>
+        
+        <div class="features-list">
+            <ul>
+                <li>
+                    <strong>🔊 Ruido de Zumbido Constante:</strong> Indica desgaste en los rodamientos del diferencial o en los dientes 
+                    de la corona/piñón. Solución: Inspección y reemplazo de componentes dañados.
+                </li>
+                <li>
+                    <strong>💧 Fuga de Aceite:</strong> Causada por retenes desgastados o juntas dañadas. Puede provocar sobrecalentamiento 
+                    y daño catastrófico. Solución: Reemplazo inmediato de sellos y revisión del nivel de aceite.
+                </li>
+                <li>
+                    <strong>🌡️ Sobrecalentamiento:</strong> Puede deberse a sobrecarga, aceite inadecuado o falta de lubricación. 
+                    Solución: Verificar especificaciones de aceite y capacidad de carga.
+                </li>
+                <li>
+                    <strong>⚙️ Vibración al Acelerar:</strong> Sugiere desbalance o juego excesivo en los engranajes. Solución: Ajuste 
+                    del backlash o reemplazo del conjunto corona-piñón.
+                </li>
+                <li>
+                    <strong>🔒 Bloqueo no Funciona:</strong> En diferenciales bloqueables, puede deberse a fallo neumático, eléctrico 
+                    o mecánico. Solución: Diagnóstico con scanner y reparación del sistema de activación.
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- TIPS PROFESIONALES -->
+    <div class="content-box">
+        <h2>💡 Tips Profesionales para Operadores</h2>
+        
+        <div class="highlight">
+            <p>
+                <strong>1. Uso Correcto del Bloqueo:</strong> Nunca actives el diferencial bloqueable en asfalto o a altas velocidades. 
+                Úsalo solo en terrenos difíciles y desactívalo al retomar superficie firme.
+            </p>
+        </div>
+
+        <div class="highlight">
+            <p>
+                <strong>2. Precalentamiento:</strong> En climas fríos, permite que el aceite del diferencial se caliente gradualmente 
+                durante los primeros 5-10 km de conducción antes de exigir el vehículo.
+            </p>
+        </div>
+
+        <div class="highlight">
+            <p>
+                <strong>3. Distribución de Carga:</strong> Asegura que la carga esté bien distribuida. Una carga desbalanceada puede 
+                sobrecargar un lado del diferencial, causando desgaste prematuro.
+            </p>
+        </div>
+
+        <div class="highlight">
+            <p>
+                <strong>4. Inspección Visual:</strong> Antes de cada viaje largo, inspecciona visualmente el diferencial en busca de 
+                fugas, daños o componentes sueltos. Una inspección de 2 minutos puede prevenir averías costosas.
+            </p>
+        </div>
+    </div>
+
+    <!-- CONCLUSIÓN -->
+    <div class="conclusion-box">
+        <h3>🎯 Conclusión</h3>
+        <p>
+            Los diferenciales son una pieza clave para el desempeño, la seguridad y la durabilidad de un camión. Con el avance de la 
+            tecnología, los sistemas modernos combinan robustez mecánica con control electrónico inteligente, asegurando un funcionamiento 
+            más eficiente y adaptativo a las condiciones del camino.
+        </p>
+        <p>
+            Un mantenimiento preventivo adecuado, el uso correcto según las condiciones de operación y la atención a las señales de 
+            advertencia pueden extender la vida útil del diferencial más allá de 500,000 kilómetros, garantizando seguridad y 
+            reduciendo costos operativos significativamente.
+        </p>
+        <p>
+            💪 <strong>Recuerda:</strong> Un diferencial bien mantenido no solo protege tu inversión, sino que puede salvar vidas 
+            al mantener el control del vehículo en situaciones críticas.
+        </p>
+    </div>
+</div>
+
+{% endblock %}
